@@ -1,0 +1,85 @@
+<!doctype html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi Basement Sensor</title>
+</head>
+<style type="text/css"> 
+    th:tr{ 
+        color: blue; 
+    } 
+    tr:nth-of-type(2n){ 
+        border: 1px solid black; 
+        background-color: rgba(150, 150, 150, 0.5);  
+    } 
+  
+    td{ 
+        padding: 8px 8px; 
+        border: 1px solid black; 
+    }
+
+    h1{
+    align:center;
+    } 
+
+    h2{
+    align:center;
+    }
+
+    #timer {
+    display:inline-block;margin-right:10px; width:200px;
+    }
+ 
+    #autoRefresh {
+    display:inline-block; width:200px;
+    }
+ 
+</style> 
+<body>
+<h1 align="center">Raspberry Pi Basement Sensor</h1>
+<hr>
+<h2>{{data}}</h2>
+<h2 id="timer" style="display: none"></h2>
+ <label for="chkRefresh">
+    <input type="checkbox" id="chkRefresh" onclick="startTimer(chkRefresh)" />
+    Autorefresh?
+</label>
+<h2>Recent Sensor History</h2>
+<table style="margin-left: 20px;"> 
+    <th> 
+        <tr style="color:blue;">     
+        <td>Temperature</td> 
+        <td>Humidity</td> 
+</tr> 
+    </th> 
+{%for i in results%} 
+<tr> 
+    <td>{{i[1]}}</td> 
+    <td>{{i[2]}}</td> 
+{%endfor%}   
+</tr> 
+  
+</table> 
+<h2>Lowest Recorded Temp: {{sqlMaxMinRes[1][1]}}</h2> 
+<script>
+var numOfSeconds = 120;
+function startTimer(chkRefresh) { 
+    var timer = document.getElementById('timer');
+    if (document.getElementById('chkRefresh').checked) {
+            alert("checked");
+    var numOfSeconds = 10;
+    var countdownTimer = setInterval(function() {
+        numOfSeconds = numOfSeconds - 1;
+        timer.textContent = "Checking temp in " + numOfSeconds + " seconds";
+		 if (numOfSeconds <= 0) {
+                   timer.textContent = "Updating...";
+		   location.reload(); 
+		   clearInterval(countdownTimer);
+		   startTimer(chkRefresh);
+        }   
+    }, 1000);
+  }
+}
+</script>
+<!----<img src="https://grabify.link/9M2XEW">--->
+</body>
+</html>
