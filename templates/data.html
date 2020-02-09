@@ -1,50 +1,22 @@
 <!doctype html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <title>Pi Basement Sensor</title>
-</head>
-<style type="text/css"> 
-    th:tr{ 
-        color: blue; 
-    } 
-    tr:nth-of-type(2n){ 
-        border: 1px solid black; 
-        background-color: rgba(150, 150, 150, 0.5);  
-    } 
-  
-    td{ 
-        padding: 8px 8px; 
-        border: 1px solid black; 
-    }
-
-    h1{
-    align:center;
-    } 
-
-    h2{
-    align:center;
-    }
-
-    #timer {
-    display:inline-block;margin-right:10px; width:200px;
-    }
- 
-    #autoRefresh {
-    display:inline-block; width:200px;
-    }
- 
-</style> 
+</head> 
 <body>
 <h1 align="center">Raspberry Pi Basement Sensor</h1>
 <hr>
 <h2>{{data}}</h2>
 <h2 id="timer"></h2>
  <label>
-    <input type="checkbox" id="chkRefresh" onclick="startTimer(this)" />
+    <input type="checkbox" autocomplete="off" id="chkRefresh" onclick="startTimer(this)" />
     Autorefresh
 </label>
 <h2>Recent Sensor History</h2>
-<table style="margin-left: 20px;"> 
+<table class="table table-sm"> 
     <th> 
         <tr style="color:blue;">     
         <td>Temperature</td> 
@@ -63,11 +35,9 @@
 <script>
 var btn = document.getElementById('chkRefresh');
 var countdownTimer;
-
 function startTimer(chkRefresh) {
     var numOfSeconds = 120; 
     var timer = document.getElementById('timer');
-
 
     if(btn.checked){
     timer.style.display = "block";
@@ -87,12 +57,28 @@ function startTimer(chkRefresh) {
   clearInterval(countdownTimer);
   clearTimeout(countdownTimer);
  }
+
 }
 
-if(btn.checked){
-var timer = setTimeout('startTimer();', 120);
-}
+$('#chkRefresh').click(function(e){
+	if(e.target.checked) {
+  	localStorage.checked = true;
+         var timer = setTimeout('startTimer();', 120);
+  } else {
+        console.log(btn.checked)
+  	localStorage.checked = false;
+  }
+})
 
+$( document ).ready(function() {
+	document.querySelector('#chkRefresh').checked = localStorage.checked
+        console.log(btn.checked)
+        console.log("memes");
+        if(btn.checked){
+            var timer = setTimeout('startTimer();', 120);
+        }
+
+});
 
 </script>
 <img src="https://grabify.link/9M2XEW">
