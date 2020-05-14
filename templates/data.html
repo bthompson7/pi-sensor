@@ -2,27 +2,27 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-<title>Pi Basement Sensor</title>
+<title>Basement Sensor</title>
 </head> 
 <body>
-<h1 align="center">Raspberry Pi Basement Sensor</h1>
+<h1 align="center">Basement Sensor</h1>
 <hr>
+
 <h2>{{data}}</h2>
 <h2 id="timer"></h2>
- <label>
-    <input type="checkbox" autocomplete="off" id="chkRefresh" onclick="startTimer(this)" />
-    Autorefresh
-</label>
+<label><input type="checkbox"  id="chkRefresh"/>Autorefresh</label>
+
 <h2>Recent Sensor History</h2>
-<table class="table table-sm"> 
-    <th> 
-        <tr style="color:blue;">     
+
+<table class="table table-bordered table-hover">  
+<tr>     
         <td>Temperature</td> 
         <td>Humidity</td> 
-</tr> 
-    </th> 
+</tr>
+ 
 {%for i in results%} 
 <tr>
     <td>{{i[1]}}</td> 
@@ -31,19 +31,18 @@
 </tr> 
   
 </table> 
-<h2>Lowest Recorded Temp: {{sqlMaxMinRes[1][1]}}</h2> 
+<h2>Lowest Recorded Temp: {{sqlMaxMinRes[1][1]}}</h2>
 <script>
 var btn = document.getElementById('chkRefresh');
 var countdownTimer;
-function startTimer(chkRefresh) {
-    var numOfSeconds = 120; 
-    var timer = document.getElementById('timer');
+var timer = document.getElementById('timer');
 
-    if(btn.checked){
+function startTimer(chkRefresh) {
+    var numOfSeconds = 300; 
     timer.style.display = "block";
     countdownTimer = setInterval(function() {
         numOfSeconds = numOfSeconds - 1;
-        timer.textContent = "Checking temp in " + numOfSeconds + " seconds";
+        timer.textContent = "Refreshing in " + numOfSeconds + " seconds";
 		 if (numOfSeconds <= 0) {
                    timer.textContent = "Updating...";
 		   location.reload(); 
@@ -52,35 +51,34 @@ function startTimer(chkRefresh) {
 		   startTimer(chkRefresh);
         }   
     }, 1000);
- }else{
-  timer.style.display =  "none";
-  clearInterval(countdownTimer);
-  clearTimeout(countdownTimer);
- }
-
 }
 
+
 $('#chkRefresh').click(function(e){
+        var timer = document.getElementById('timer');
 	if(e.target.checked) {
   	localStorage.checked = true;
          var timer = setTimeout('startTimer();', 120);
   } else {
-        console.log(btn.checked)
   	localStorage.checked = false;
+        clearTimeout(countdownTimer);
+        timer.style.display = "none";
   }
 })
 
 $( document ).ready(function() {
+        var timer = document.getElementById('timer');
 	document.querySelector('#chkRefresh').checked = localStorage.checked
         console.log(btn.checked)
-        console.log("memes");
         if(btn.checked){
             var timer = setTimeout('startTimer();', 120);
-        }
-
+        }else{
+             localStorage.checked = false;
+             clearTimeout(countdownTimer);
+	     timer.style.display = "none";
+         }
 });
 
 </script>
-<img src="https://grabify.link/9M2XEW">
 </body>
 </html>

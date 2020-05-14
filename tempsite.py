@@ -20,7 +20,7 @@ def db_get_data():
         print("Error fetching data")
     return res
 
-@app.route('/data')
+@app.route('/')
 def main():
    db_con()
    data = getSensorData()
@@ -40,10 +40,6 @@ def db_get_max_min():
     sqlRes = cursor.fetchall()
     return sqlRes
 
-def sendAlert():
-   print("Alert sent")
-   os.system("curl https://notify.run/45HwVDLxNxptvaMe -d 'Temp dropped below 50'")
-
 def getSensorData():
         global results
         humd, temp = Adafruit_DHT.read(DHT_SENSOR,DHT_PIN)
@@ -57,17 +53,11 @@ def getSensorData():
             except:
                 db.rollback()
                 print("Error inserting data")
-            if tempToFar < 50.0:
-               sendAlert()
             return ("Temp: %s 'F Humdity: %s %%"%(tempRounded,humd))
         else:
            return "Sensor Error, refresh the page"
 
-flask_site = WSGIResource(reactor, reactor.getThreadPool(), app)
-root = Resource()
-root.putChild(b'my_flask', flask_site)
-site_example = ReverseProxyResource('www.example.com', 80, '/')
-root.putChild('data', site_example)
-reactor.listenTCP(5000, Site(root))
+resource = WSGIResource(reactor, reactor.getThreadPool(), app)
+site = Site(resource)
+reactor.listenTCP(5000, site)
 reactor.run()
-
