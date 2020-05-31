@@ -6,10 +6,12 @@ from twisted.web.proxy import ReverseProxyResource
 from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
+from flask import request
 
 app = Flask(__name__)
 DHT_SENSOR = Adafruit_DHT.DHT11
 DHT_PIN = 4
+
 
 def db_get_data():
     try:
@@ -22,11 +24,21 @@ def db_get_data():
 
 @app.route('/')
 def main():
+   global motion_data
+   motion_data = 'Currently Offline'
    db_con()
    data = getSensorData()
    results = db_get_data()
    sqlMaxMinRes = db_get_max_min()
+   motion = motion_data
+   #print(motion)
    return render_template("data.html", **locals())
+
+@app.route("/motion", methods=['GET','POST'])
+def motion():
+   global motion_data
+   motion_data = request.form['motion']
+   print(motion_data)
 
 def db_con():
     global cursor

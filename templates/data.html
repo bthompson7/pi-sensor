@@ -12,6 +12,11 @@
 <hr>
 
 <h2>{{data}}</h2>
+
+{% if motion is defined %}
+<h2>Motion Sensor: {{motion}}</h2>
+{%endif%}
+
 <h2 id="timer"></h2>
 <label><input type="checkbox"  id="chkRefresh"/>Autorefresh</label>
 
