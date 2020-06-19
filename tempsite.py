@@ -10,12 +10,12 @@ from flask import request,Response,redirect,url_for
 from send import *
 import datetime
 import pytz
+import threading
 
 
 app = Flask(__name__)
 DHT_SENSOR = Adafruit_DHT.DHT11
 DHT_PIN = 4
-email = EmailSender()
 
 is_maintenance_mode = False
 
@@ -36,27 +36,30 @@ def db_get_data():
 @app.route('/')
 def main():
    global motion_data
-   motion_data = "Offline"
    db_con()
    data = getSensorData()
    results = db_get_data()
    sqlMaxMinRes = db_get_max_min()
-   motion = motion_data
+   try:
+      motion = motion_data
+   except:
+      motion = "Offline"
 
    return render_template("data.html", **locals())
 
-#handles incoming post requests from the remote motion sensor
+#handles incoming http post requests from the remote motion sensor
 @app.route("/motion", methods=['POST'])
 def motion():
+   global motion_data
    motion_data = request.form['motion']
-   print(motion_data)
+   #print(motion_data)
    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
-   print(now.hour)
-   hour = now.hour
-   if "Lots of motion detected" in motion_data and (hour >= 23 and hour <= 5): #23 -> 11 PM
-      print("Lots of motion!")
-      email.sendEmail(motion)
-
+   #print(now.hour)
+   hour = int(now.hour)
+   if "Lots of motion detected" in motion_data and (hour == 23 or hour == 00 or hour >= 1 and hour <= 5): #Email Alerts are active between 11PM - 5 AM
+      print("Lots of motion detected sending alert...")
+      x = threading.Thread(target=email, args=(1,))
+      x.start()
    return {"response": "200"}, 200
 
 
@@ -69,6 +72,10 @@ def db_con():
     global db
     db = pymysql.connect("localhost","monitor","password","temps")
     cursor = db.cursor()
+
+def email(motion):
+   email = EmailSender()
+   email.sendEmail(motion)
 
 def db_get_max_min():
     sqlMaxMin = "SELECT * FROM tempdata2 order by temp asc"
