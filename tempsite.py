@@ -16,6 +16,9 @@ import threading
 app = Flask(__name__)
 DHT_SENSOR = Adafruit_DHT.DHT11
 DHT_PIN = 4
+sem = threading.Semaphore()
+
+
 
 is_maintenance_mode = False
 
@@ -35,8 +38,10 @@ def db_get_data():
 
 @app.route('/')
 def main():
+   sem.acquire()
    global motion_data
    db_con()
+   #sema acquire here
    data = getSensorData()
    results = db_get_data()
    sqlMaxMinRes = db_get_max_min()
@@ -44,7 +49,8 @@ def main():
       motion = motion_data
    except:
       motion = "Offline"
-
+   #sema release
+   sem.release()
    return render_template("data.html", **locals())
 
 #handles incoming http post requests from the remote motion sensor
@@ -54,11 +60,10 @@ def motion():
    motion_data = request.form['motion']
    #print(motion_data)
    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
-   #print(now.hour)
    hour = int(now.hour)
    if "Lots of motion detected" in motion_data and (hour == 23 or hour == 00 or hour >= 1 and hour <= 5): #Email Alerts are active between 11PM - 5 AM
       print("Lots of motion detected sending alert...")
-      x = threading.Thread(target=email, args=(1,))
+      x = threading.Thread(target=email, args=(motion_data,))
       x.start()
    return {"response": "200"}, 200
 
