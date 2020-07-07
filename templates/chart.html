@@ -18,12 +18,21 @@ var ctx = document.getElementById('myChart');
 
 var chart = new Chart(document.getElementById("myChart"),
 {"type":"line","data":
-{"labels":["January","February","March","April","May","June","July"],
-"datasets":[{"label":"My First Dataset",
-"data":[14,14,12,13,14,12,10,11],
+{"labels":{{x_val}},
+"datasets":[{"label":"Well Level",
+"data":{{y_val}},
 "fill":false,"borderColor":"rgb(75, 192, 192)",
-"lineTension":0.1}]},
-"options":{}});
+"lineTension":0.1}]
+},options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
 
 </script>
 </body>

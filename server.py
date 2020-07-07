@@ -42,15 +42,12 @@ def main():
    data = getSensorData()
    results = db_get_data()
    sqlMaxMinRes = db_get_max_min()
-   print("test")
    try:
       motion = motion_data
    except:
       motion = "Offline"
-   print("sleep")
    time.sleep(2)
    sema.release()
-   print("render next")
    return render_template("data.html", **locals())
 
 #handles incoming http post requests from the remote motion sensor
@@ -68,9 +65,22 @@ def motion():
    return {"response": "200"}, 200
 
 
+
+
+
+
 @app.route('/chart')
 def chart():
-   return render_template("chart.html")
+   #0 - id 1 - level
+   select = "select * from(select * from well_data order by id desc limit 10)Var1 order by id asc"
+   cursor.execute(select)
+   data2 = cursor.fetchall()
+   x_val = [id[0] for id in data2]
+   y_val = [level[1] for level in data2]
+   print(x_val)
+   print(y_val)
+
+   return render_template("chart.html",**locals())
 
 @app.route('/maintenance')
 def maintenance():
