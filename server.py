@@ -17,13 +17,17 @@ app = Flask(__name__)
 DHT_SENSOR = Adafruit_DHT.DHT11
 DHT_PIN = 4
 sema = threading.Semaphore()
-is_maintenance_mode = True
+is_maintenance_mode = False
 
 
 @app.before_request
 def check_for_maintenance():
    if is_maintenance_mode and request.path != url_for('maintenance') and request.remote_addr != '192.168.1.4':
       return redirect(url_for('maintenance'))
+
+@app.before_request
+def loading():
+      db_con()
 
 def db_get_data():
     try:
@@ -38,7 +42,6 @@ def db_get_data():
 def main():
    sema.acquire()
    global motion_data
-   db_con()
    data = getSensorData()
    results = db_get_data()
    sqlMaxMinRes = db_get_max_min()
