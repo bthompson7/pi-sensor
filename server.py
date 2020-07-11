@@ -25,10 +25,6 @@ def check_for_maintenance():
    if is_maintenance_mode and request.path != url_for('maintenance') and request.remote_addr != '192.168.1.4':
       return redirect(url_for('maintenance'))
 
-@app.before_request
-def loading():
-      db_con()
-
 def db_get_data():
     try:
         sqlSelect = "SELECT * FROM tempdata2 ORDER BY id desc limit 10"
@@ -40,7 +36,7 @@ def db_get_data():
 
 @app.route('/')
 def main():
-   sema.acquire()
+   db_con()
    global motion_data
    data = getSensorData()
    results = db_get_data()
@@ -49,8 +45,6 @@ def main():
       motion = motion_data
    except:
       motion = "Offline"
-   time.sleep(2)
-   sema.release()
    return render_template("data.html", **locals())
 
 #handles incoming http post requests from the remote motion sensor
@@ -75,6 +69,7 @@ def motion():
 @app.route('/chart')
 def chart():
    #0 - id 1 - level
+   db_con()
    select = "select * from(select * from well_data order by id desc limit 10)Var1 order by id asc"
    cursor.execute(select)
    data2 = cursor.fetchall()

@@ -20,25 +20,25 @@ function startTimer(chkRefresh) {
 
 
 $('#chkRefresh').click(function(e){
-        var timer = document.getElementById('timer');
-	if(e.target.checked) {
-  	localStorage.checked = true;
+    var timer = document.getElementById('timer');
+    if(e.target.checked) {
+         localStorage.setItem('refresh', true);
          var timer = setTimeout('startTimer();', 120);
-  } else {
-  	localStorage.checked = false;
+  }else {
+        localStorage.setItem('refresh',false);
         clearTimeout(countdownTimer);
         timer.style.display = "none";
   }
 })
 
-$( document ).ready(function() {
+$(document).ready(function() {
         var timer = document.getElementById('timer');
-	document.querySelector('#chkRefresh').checked = localStorage.checked
-        console.log(btn.checked)
-        if(btn.checked){
+        if(localStorage.getItem('refresh') === "true"){
             var timer = setTimeout('startTimer();', 120);
+            document.querySelector('#chkRefresh').checked = true
         }else{
-             localStorage.checked = false;
+             localStorage.setItem('refresh', false);
+             document.querySelector('#chkRefresh').checked = false;
              clearTimeout(countdownTimer);
 	     timer.style.display = "none";
          }
