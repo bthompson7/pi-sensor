@@ -11,7 +11,7 @@ from send import *
 import datetime
 import pytz
 import threading
-
+from flask_caching import Cache
 
 app = Flask(__name__)
 DHT_SENSOR = Adafruit_DHT.DHT11
@@ -19,6 +19,14 @@ DHT_PIN = 4
 sema = threading.Semaphore()
 is_maintenance_mode = False
 
+config = {
+    "DEBUG": True,          # some Flask specific configs
+    "CACHE_TYPE": "simple", # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 300
+}
+
+app.config.from_mapping(config)
+cache = Cache(app)
 
 @app.before_request
 def check_for_maintenance():
@@ -36,15 +44,16 @@ def db_get_data():
 
 @app.route('/')
 def main():
+   sema.acquire()
    db_con()
    global motion_data
    data = getSensorData()
    results = db_get_data()
-   sqlMaxMinRes = db_get_max_min()
    try:
       motion = motion_data
    except:
       motion = "Offline"
+   sema.release()
    return render_template("data.html", **locals())
 
 #handles incoming http post requests from the remote motion sensor
@@ -55,26 +64,23 @@ def motion():
    #print(motion_data)
    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
    hour = int(now.hour)
-   if "Lots of motion detected" in motion_data and (hour == 23 or hour == 00 or hour >= 1 and hour <= 5): #Email Alerts are active between 11PM - 5 AM
+   if "Lots of motion detected" in motion_data and (hour == 23 or hour == 00 or hour >= 1 and hour <= 5): #Email Alerts are active between 11PM - 6 AM
       print("Lots of motion detected sending alert...")
       x = threading.Thread(target=email, args=(motion_data,))
       x.start()
    return {"response": "200"}, 200
 
-
-
-
-
-
 @app.route('/chart')
+@cache.cached(timeout=300) #300 seconds = 5 mins
 def chart():
-   #0 - id 1 - level
    db_con()
-   select = "select * from(select * from well_data order by id desc limit 10)Var1 order by id asc"
-   cursor.execute(select)
+   #select = "select * from(select * from well_data order by id desc limit 10)Var1 order by id asc"
+   select_temp_data = "select * from(select * from tempdata2 order by id desc limit 50)Var1 order by id asc"
+   cursor.execute(select_temp_data)
    data2 = cursor.fetchall()
    x_val = [id[0] for id in data2]
-   y_val = [level[1] for level in data2]
+   y_val = [temp[1] for temp in data2] #temp
+   y_val2 = [humd[2] for humd in data2] #humd
    print(x_val)
    print(y_val)
 

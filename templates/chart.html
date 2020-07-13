@@ -8,10 +8,10 @@
 
 <!- chart.js for creating the charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.bundle.min.js"></script>
-<title>Chart Test</title>
+<title>Sensor Graph</title>
 </head> 
 <body>
-<h1 align="center">Chart Test</h1>
+<h1 align="center">Sensor Data Line Chart</h1>
 <canvas id="myChart" width="200" height="200"></canvas>
 <script>
 
@@ -20,9 +20,12 @@ var ctx = document.getElementById('myChart');
 var chart = new Chart(document.getElementById("myChart"),
 {"type":"line","data":
 {"labels":{{x_val}},
-"datasets":[{"label":"Well Level",
+"datasets":[{"label":"Temp",
 "data":{{y_val}},
-"fill":false,"borderColor":"rgb(75, 192, 192)",
+"fill":false,"borderColor":"rgb(255, 0, 0)",
+"lineTension":0.1},{"label":"Humidity",
+"data":{{y_val2}}, 
+"fill":false,"borderColor":"rgb(75, 190, 190)",
 "lineTension":0.1}]
 },options: {
         scales: {
