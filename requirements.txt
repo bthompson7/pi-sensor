@@ -1,0 +1,8 @@
+Twisted
+RPi.GPIO
+PyMySQL
+pytz
+Jinja2
+Flask
+Flask-Caching
+Adafruit-DHT

@@ -9,7 +9,7 @@ from twisted.web.wsgi import WSGIResource
 from flask import request,Response,redirect,url_for
 from send import *
 import datetime
-import pytz
+import pytz,sys
 import threading
 from flask_caching import Cache
 
@@ -17,20 +17,26 @@ app = Flask(__name__)
 DHT_SENSOR = Adafruit_DHT.DHT11
 DHT_PIN = 4
 sema = threading.Semaphore()
-is_maintenance_mode = False
 
 config = {
-    "DEBUG": True,          # some Flask specific configs
-    "CACHE_TYPE": "simple", # Flask-Caching related configs
+    "DEBUG": False,
+    "CACHE_TYPE": "simple",
     "CACHE_DEFAULT_TIMEOUT": 300
 }
 
 app.config.from_mapping(config)
 cache = Cache(app)
 
+if len(sys.argv) > 2:
+    print('You have specified too many arguments')
+    sys.exit()
+
+is_maintenance_mode = sys.argv[1]
+
 @app.before_request
 def check_for_maintenance():
-   if is_maintenance_mode and request.path != url_for('maintenance') and request.remote_addr != '192.168.1.4':
+   if is_maintenance_mode == 'True' and request.path != url_for('maintenance') and request.remote_addr != '192.168.1.4':
+      print("Maintenance mode enabled! Request from ",request.remote_addr)
       return redirect(url_for('maintenance'))
 
 def db_get_data():
@@ -44,6 +50,7 @@ def db_get_data():
 
 @app.route('/')
 def main():
+   print("Request for / from ",request.remote_addr)
    sema.acquire()
    db_con()
    global motion_data
@@ -61,7 +68,6 @@ def main():
 def motion():
    global motion_data
    motion_data = request.form['motion']
-   #print(motion_data)
    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
    hour = int(now.hour)
    if "Lots of motion detected" in motion_data and (hour == 23 or hour == 00 or hour >= 1 and hour <= 5): #Email Alerts are active between 11PM - 6 AM
@@ -73,6 +79,7 @@ def motion():
 @app.route('/chart')
 @cache.cached(timeout=300) #300 seconds = 5 mins
 def chart():
+   print("Request for /chart from ", request.remote_addr)
    db_con()
    #select = "select * from(select * from well_data order by id desc limit 10)Var1 order by id asc"
    select_temp_data = "select * from(select * from tempdata2 order by id desc limit 50)Var1 order by id asc"
@@ -81,9 +88,6 @@ def chart():
    x_val = [id[0] for id in data2]
    y_val = [temp[1] for temp in data2] #temp
    y_val2 = [humd[2] for humd in data2] #humd
-   print(x_val)
-   print(y_val)
-
    return render_template("chart.html",**locals())
 
 @app.route('/maintenance')
@@ -103,6 +107,7 @@ def db_con():
 def email(motion):
    email = EmailSender()
    email.sendEmail(motion)
+
 
 def db_get_max_min():
     sqlMaxMin = "SELECT * FROM tempdata2 order by temp asc"
