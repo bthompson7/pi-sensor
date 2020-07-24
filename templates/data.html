@@ -12,7 +12,14 @@
 <hr>
 
 <h2>{{data}}</h2>
+
+{% if motion is not none %}
 <h2>Motion Sensor: {{motion}}</h2>
+{%endif %}
+
+{% if temp2 is not none%}
+<h2>{{temp2}}</h2>
+{%endif%}
 
 <h2 id="timer"></h2>
 <label><input type="checkbox"  id="chkRefresh"/>Autorefresh</label>
@@ -32,7 +39,7 @@
 {%endfor%}   
 </tr> 
 </table>
-<a class="btn btn-primary" href="http://192.168.1.2:5000/chart"  target="_blank" role="button">View Sensor Chart</a>
+<a class="btn btn-primary" href="/chart"  target="_blank" role="button">View Sensor Chart</a>
 <script src="{{url_for('static', filename='refresh.js')}}"></script>
 </body>
 </html>

@@ -31,6 +31,11 @@ if len(sys.argv) > 2:
     print('You have specified too many arguments')
     sys.exit()
 
+if len(sys.argv) < 2:
+   print('You need to supply more arguments')
+   sys.exit()
+
+
 is_maintenance_mode = sys.argv[1]
 
 @app.before_request
@@ -59,9 +64,24 @@ def main():
    try:
       motion = motion_data
    except:
-      motion = "Offline"
+      motion = None
+
+   try:
+      temp2 = temp_data2
+   except:
+      temp2 = None
    sema.release()
    return render_template("data.html", **locals())
+
+
+#this function handes incoming http post requests from another remote temp/humd. sensor
+@app.route("/temp2",methods=['POST'])
+def temp2():
+   global temp_data2
+   temp_data2 = request.form['tempdata']
+   print(temp_data)
+   #some db query here (insert into some table for temp2 data)
+   return {"response":"200"},200
 
 #handles incoming http post requests from the remote motion sensor
 @app.route("/motion", methods=['POST'])
