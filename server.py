@@ -40,10 +40,11 @@ is_maintenance_mode = sys.argv[1]
 
 @app.before_request
 def check_for_maintenance():
-   if is_maintenance_mode == 'True' and request.path != url_for('maintenance') and request.remote_addr != '192.168.1.4':
+   if is_maintenance_mode == 'True' and request.path != url_for('maintenance') and request.remote_addr != '192.168.1.6':
       print("Maintenance mode enabled! Request from ",request.remote_addr)
       return redirect(url_for('maintenance'))
 
+#get 10 most recent readings
 def db_get_data():
     try:
         sqlSelect = "SELECT * FROM tempdata2 ORDER BY id desc limit 10"
@@ -56,11 +57,19 @@ def db_get_data():
 @app.route('/')
 def main():
    print("Request for / from ",request.remote_addr)
-   sema.acquire()
    db_con()
+
    global motion_data
-   data = getSensorData()
+   global temp_data1
+   global temp_data2
+
    results = db_get_data()
+
+   try:
+      temp1 = temp_data1
+   except:
+      temp1 = None
+
    try:
       motion = motion_data
    except:
@@ -70,18 +79,54 @@ def main():
       temp2 = temp_data2
    except:
       temp2 = None
-   sema.release()
+
    return render_template("data.html", **locals())
 
+#this function handles incoming http post request from the temp/humd sensor on the pi that runs the server
+#this is so that temp/humd alerts can be sent out
+@app.route("/temp1",methods=['POST'])
+def temp1():
+   db_con()
+   #we will get a response like: ImmutableMultiDict([('humd', '61.0'), ('temp', '69.8')])
+   global temp_data1
+   data = request.form
+   temp = data['temp']
+   humd = data['humd']
+   temp_data1 = "Temp: " + temp + " Humd: " + humd
 
-#this function handes incoming http post requests from another remote temp/humd. sensor
+   if temp is None or humd is None:
+      return {"response":"bad request"},400
+   print("working...")
+   temp = float(temp)
+   humd = float(humd)
+
+   try:
+      print("inserting data")
+      sqlInsert = ("""INSERT INTO tempdata2 (temp,humd) VALUES(%d,%d)"""%(float(temp),float(humd)))
+      cursor.execute(sqlInsert)
+      db.commit()
+      print("insert was successful!")
+
+   except:
+
+      db.rollback()
+      print("Error inserting data")
+
+   #send out temp alert if we need to
+   if temp < 60.0:
+      print("The temp has fallen below an acceptable range send an alert")
+      x = threading.Thread(target=email, args=("Temp has fallen below an acceptable range. The last reading was: ",temp_data1,))
+      x.start()
+   return {"response":"ok"},200
+
+#this function handes incoming http post requests from another remote temp/humd sensor
 @app.route("/temp2",methods=['POST'])
 def temp2():
    global temp_data2
    temp_data2 = request.form['tempdata']
-   print(temp_data)
-   #some db query here (insert into some table for temp2 data)
-   return {"response":"200"},200
+   if temp_data2 is None:
+      return {"response":"bad request"},400
+   return {"response":"ok"},200
 
 #handles incoming http post requests from the remote motion sensor
 @app.route("/motion", methods=['POST'])
@@ -92,7 +137,7 @@ def motion():
    hour = int(now.hour)
    if "Lots of motion detected" in motion_data and (hour == 23 or hour == 00 or hour >= 1 and hour <= 5): #Email Alerts are active between 11PM - 6 AM
       print("Lots of motion detected sending alert...")
-      x = threading.Thread(target=email, args=(motion_data,))
+      x = threading.Thread(target=email, args=("Lots of motion detected",motion_data,))
       x.start()
    return {"response": "200"}, 200
 
@@ -101,7 +146,6 @@ def motion():
 def chart():
    print("Request for /chart from ", request.remote_addr)
    db_con()
-   #select = "select * from(select * from well_data order by id desc limit 10)Var1 order by id asc"
    select_temp_data = "select * from(select * from tempdata2 order by id desc limit 50)Var1 order by id asc"
    cursor.execute(select_temp_data)
    data2 = cursor.fetchall()
@@ -124,9 +168,9 @@ def db_con():
     db = pymysql.connect("localhost","monitor","password","temps")
     cursor = db.cursor()
 
-def email(motion):
+def email(email_msg,sensor_data):
    email = EmailSender()
-   email.sendEmail(motion)
+   email.sendEmail(email_msg,sensor_data)
 
 
 def db_get_max_min():

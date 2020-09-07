@@ -11,13 +11,15 @@
 <h1 align="center">Basement Sensor</h1>
 <hr>
 
-<h2>{{data}}</h2>
+{% if temp1 is not none %}
+<h2>{{temp1}}</h2>
+{%endif%}
 
 {% if motion is not none %}
 <h2>Motion Sensor: {{motion}}</h2>
 {%endif %}
 
-{% if temp2 is not none%}
+{% if temp2 is not none %}
 <h2>{{temp2}}</h2>
 {%endif%}
 
@@ -32,13 +34,14 @@
         <td>Humidity</td> 
 </tr>
  
-{%for i in results%} 
+{%for res in results%} 
 <tr>
-    <td>{{i[1]}}</td> 
-    <td>{{i[2]}}</td> 
+    <td>{{res[1]}}</td> 
+    <td>{{res[2]}}</td> 
 {%endfor%}   
 </tr> 
 </table>
+
 <a class="btn btn-primary" href="/chart"  target="_blank" role="button">View Sensor Chart</a>
 <script src="{{url_for('static', filename='refresh.js')}}"></script>
 </body>
