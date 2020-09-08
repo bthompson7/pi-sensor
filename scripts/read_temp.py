@@ -7,14 +7,18 @@ DHT_PIN = 4
 
 while True:
 	humd, temp = Adafruit_DHT.read(DHT_SENSOR, DHT_PIN)
+	print(humd)
+	print(temp)
 	if humd is not None and temp is not None:
-		tempToFair = (temp * 1.8) + 32.0
-		tempRounded = round(tempToFair,4)
-		print("Temp = %s F Humditiy = %s"%(tempRounded,humd))
-		tempData = {"temp":tempRounded,"humd":humd}
-		json.dumps(tempData)
-		x = requests.post("http://192.168.1.2:5000/temp1",data=tempData)
-		print(x.text)
+		try:
+			tempToFair = (temp * 1.8) + 32.0
+			tempRounded = round(tempToFair,4)
+			print("Temp = %s F Humditiy = %s"%(tempRounded,humd))
+			tempData = {"temp":tempRounded,"humd":humd}
+			json.dumps(tempData)
+			x = requests.post("http://192.168.1.2:5000/temp1",data=tempData)
+		except:
+			time.sleep(600)
 	else:
 		print("post request failed!")
 		tempData = {"error":"Sensor error refresh the page"}

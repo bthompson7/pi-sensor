@@ -40,14 +40,15 @@ is_maintenance_mode = sys.argv[1]
 
 @app.before_request
 def check_for_maintenance():
-   if is_maintenance_mode == 'True' and request.path != url_for('maintenance') and request.remote_addr != '192.168.1.6':
+   if is_maintenance_mode == 'True' and request.path != url_for('maintenance'):
       print("Maintenance mode enabled! Request from ",request.remote_addr)
       return redirect(url_for('maintenance'))
 
 #get 10 most recent readings
 def db_get_data():
     try:
-        sqlSelect = "SELECT * FROM tempdata2 ORDER BY id desc limit 10"
+        db_con()
+        sqlSelect = "(select * from tempdata2 order by id desc limit 10) UNION (select * from tempdata3 order by id limit 10)"
         cursor.execute(sqlSelect)
         res = cursor.fetchall()
     except:
@@ -122,11 +123,38 @@ def temp1():
 #this function handes incoming http post requests from another remote temp/humd sensor
 @app.route("/temp2",methods=['POST'])
 def temp2():
+   db_con()
    global temp_data2
-   temp_data2 = request.form['tempdata']
-   if temp_data2 is None:
+   data = request.form
+   temp = data['temp']
+   humd = data['humd']
+   temp_data1 = "Temp: " + temp + " Humd: " + humd
+
+   if temp is None or humd is None:
       return {"response":"bad request"},400
+   print("working...")
+   temp = float(temp)
+   humd = float(humd)
+
+   try:
+      print("inserting data")
+      sqlInsert = ("""INSERT INTO tempdata3 (temp,humd) VALUES(%d,%d)"""%(float(temp),float(humd)))
+      cursor.execute(sqlInsert)
+      db.commit()
+      print("insert was successful!")
+
+   except:
+
+      db.rollback()
+      print("Error inserting data")
+
+   #send out temp alert if we need to
+   if temp < 60.0:
+      print("The temp has fallen below an acceptable range send an alert")
+      x = threading.Thread(target=email, args=("Temp has fallen below an acceptable range. The last reading was: ",temp_data1,))
+      x.start()
    return {"response":"ok"},200
+
 
 #handles incoming http post requests from the remote motion sensor
 @app.route("/motion", methods=['POST'])
