@@ -1,5 +1,5 @@
 import Adafruit_DHT
-import time,os,pymysql
+import time,os,pymysql,json
 from flask import Flask,render_template
 from twisted.internet import reactor
 from twisted.web.proxy import ReverseProxyResource
@@ -88,28 +88,26 @@ def main():
 @app.route("/temp1",methods=['POST'])
 def temp1():
    db_con()
-   #we will get a response like: ImmutableMultiDict([('humd', '61.0'), ('temp', '69.8')])
    global temp_data1
    data = request.form
    temp = data['temp']
-   humd = data['humd']
-   temp_data1 = "Temp: " + temp + " Humd: " + humd
+   humid = data['humd']
+   temp_data1 = "Temperature: " + temp + " Humidity: " + humid + " %"
 
-   if temp is None or humd is None:
+   if temp is None or humid is None:
       return {"response":"bad request"},400
-   print("working...")
+   print("Working...")
    temp = float(temp)
-   humd = float(humd)
+   humid = float(humid)
 
    try:
-      print("inserting data")
-      sqlInsert = ("""INSERT INTO tempdata2 (temp,humd) VALUES(%d,%d)"""%(float(temp),float(humd)))
+      print("Inserting data")
+      sqlInsert = ("""INSERT INTO tempdata2 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
       cursor.execute(sqlInsert)
       db.commit()
       print("insert was successful!")
 
    except:
-
       db.rollback()
       print("Error inserting data")
 
@@ -118,6 +116,16 @@ def temp1():
       print("The temp has fallen below an acceptable range send an alert")
       x = threading.Thread(target=email, args=("Temp has fallen below an acceptable range. The last reading was: ",temp_data1,))
       x.start()
+   if temp >= 80.0:
+      print("The temp is high sending an alert")
+      x = threading.Thread(target=email, args=("Temp is high. The last reading was: ",temp_data1,))
+      x.start()
+   if humid >= 75.0:
+     x = threading.Thread(target=email, args=("Humidity is high. The last reading was: ",temp_data1,))
+     x.start()
+   if humid <= 35.0:
+     x = threading.Thread(target=email, args=("Humidity is low. The last reading was: ",temp_data1,))
+     x.start()
    return {"response":"ok"},200
 
 #this function handes incoming http post requests from another remote temp/humd sensor
@@ -127,24 +135,23 @@ def temp2():
    global temp_data2
    data = request.form
    temp = data['temp']
-   humd = data['humd']
-   temp_data1 = "Temp: " + temp + " Humd: " + humd
+   humid = data['humd']
+   temp_data2 = "Temperature: " + temp + " Humidity: " + humid + " %"
 
-   if temp is None or humd is None:
+   if temp is None or humid is None:
       return {"response":"bad request"},400
    print("working...")
    temp = float(temp)
-   humd = float(humd)
+   humid = float(humid)
 
    try:
       print("inserting data")
-      sqlInsert = ("""INSERT INTO tempdata3 (temp,humd) VALUES(%d,%d)"""%(float(temp),float(humd)))
+      sqlInsert = ("""INSERT INTO tempdata3 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
       cursor.execute(sqlInsert)
       db.commit()
       print("insert was successful!")
 
    except:
-
       db.rollback()
       print("Error inserting data")
 
@@ -153,6 +160,17 @@ def temp2():
       print("The temp has fallen below an acceptable range send an alert")
       x = threading.Thread(target=email, args=("Temp has fallen below an acceptable range. The last reading was: ",temp_data1,))
       x.start()
+   if temp >= 80.0:
+      print("The temp is high sending an alert")
+      x = threading.Thread(target=email, args=("Temp is high. The last reading was: ",temp_data1,))
+      x.start()
+   if humid >= 75.0:
+     x = threading.Thread(target=email, args=("Humidity is high. The last reading was: ",temp_data1,))
+     x.start()
+   if humid <= 35.0:
+     x = threading.Thread(target=email, args=("Humidity is low. The last reading was: ",temp_data1,))
+     x.start()
+
    return {"response":"ok"},200
 
 
@@ -165,7 +183,7 @@ def motion():
    hour = int(now.hour)
    if "Lots of motion detected" in motion_data and (hour == 23 or hour == 00 or hour >= 1 and hour <= 5): #Email Alerts are active between 11PM - 6 AM
       print("Lots of motion detected sending alert...")
-      x = threading.Thread(target=email, args=("Lots of motion detected",motion_data,))
+      x = threading.Thread(target=email, args=("Lots of motion detected ",motion_data,))
       x.start()
    return {"response": "200"}, 200
 
@@ -177,7 +195,7 @@ def chart():
    select_temp_data = "select * from(select * from tempdata2 order by id desc limit 50)Var1 order by id asc"
    cursor.execute(select_temp_data)
    data2 = cursor.fetchall()
-   x_val = [id[0] for id in data2]
+   x_val = [date[3] for date in data2]
    y_val = [temp[1] for temp in data2] #temp
    y_val2 = [humd[2] for humd in data2] #humd
    return render_template("chart.html",**locals())
@@ -199,30 +217,6 @@ def db_con():
 def email(email_msg,sensor_data):
    email = EmailSender()
    email.sendEmail(email_msg,sensor_data)
-
-
-def db_get_max_min():
-    sqlMaxMin = "SELECT * FROM tempdata2 order by temp asc"
-    cursor.execute(sqlMaxMin)
-    sqlRes = cursor.fetchall()
-    return sqlRes
-
-def getSensorData():
-        global results
-        humd, temp = Adafruit_DHT.read(DHT_SENSOR,DHT_PIN)
-        if humd is not None and temp is not None:
-            tempToFar = (temp * 1.8) + 32.0
-            tempRounded = round(tempToFar,2)
-            sqlInsert = ("""INSERT INTO tempdata2 (temp,humd) VALUES(%d,%d)"""%(tempRounded,humd))
-            try:
-                cursor.execute(sqlInsert)
-                db.commit()
-            except:
-                db.rollback()
-                print("Error inserting data")
-            return ("Temp: %s 'F Humdity: %s %%"%(tempRounded,humd))
-        else:
-           return "Sensor Error, refresh the page"
 
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
 site = Site(resource)

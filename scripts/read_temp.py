@@ -5,6 +5,10 @@ import Adafruit_DHT,time,requests,json
 DHT_SENSOR = Adafruit_DHT.DHT11
 DHT_PIN = 4
 
+#sleep for 30 seconds to wait for the server to start
+#this is incase power is lost and the entire system needs to reboot
+time.sleep(30)
+
 while True:
 	humd, temp = Adafruit_DHT.read(DHT_SENSOR, DHT_PIN)
 	print(humd)
@@ -16,8 +20,11 @@ while True:
 			print("Temp = %s F Humditiy = %s"%(tempRounded,humd))
 			tempData = {"temp":tempRounded,"humd":humd}
 			json.dumps(tempData)
+			print("Sending request to server")
 			x = requests.post("http://192.168.1.2:5000/temp1",data=tempData)
+			print(x.text)
 		except:
+			print("request failed sleeping. The server must be down")
 			time.sleep(600)
 	else:
 		print("post request failed!")

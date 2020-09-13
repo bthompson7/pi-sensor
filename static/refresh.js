@@ -3,7 +3,7 @@ var countdownTimer;
 var timer = document.getElementById('timer');
 
 function startTimer(chkRefresh) {
-    var numOfSeconds = 300; 
+    var numOfSeconds = 300;
     timer.style.display = "block";
     countdownTimer = setInterval(function() {
         numOfSeconds = numOfSeconds - 1;
@@ -14,7 +14,7 @@ function startTimer(chkRefresh) {
                    timer.style.display =  "block";
 		   clearInterval(countdownTimer);
 		   startTimer(chkRefresh);
-        }   
+        }
     }, 1000);
 }
 

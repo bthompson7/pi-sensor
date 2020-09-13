@@ -11,7 +11,7 @@
 <title>Sensor Graph</title>
 </head> 
 <body>
-<h1 align="center">Sensor Data Line Chart</h1>
+<h1 align="center">Temperature Sensors - Last 50 Readings</h1>
 <canvas id="myChart" width="200" height="200"></canvas>
 <script>
 
@@ -19,11 +19,11 @@ var ctx = document.getElementById('myChart');
 
 var chart = new Chart(document.getElementById("myChart"),
 {"type":"line","data":
-{"labels":{{x_val}},
-"datasets":[{"label":"Temp(Fahrenheit)",
+{"labels":{{x_val|tojson}},
+"datasets":[{"label":"Temp Sensor #1(Fahrenheit)",
 "data":{{y_val}},
 "fill":false,"borderColor":"rgb(255, 0, 0)",
-"lineTension":0.1},{"label":"Humidity(%)",
+"lineTension":0.1},{"label":"Humidity Sensor #1(%)",
 "data":{{y_val2}}, 
 "fill":false,"borderColor":"rgb(75, 190, 190)",
 "lineTension":0.1}]
@@ -31,7 +31,7 @@ var chart = new Chart(document.getElementById("myChart"),
         scales: {
             yAxes: [{
                 ticks: {
-                    beginAtZero: true
+		    suggestedMin:40
                 }
             }]
         }
