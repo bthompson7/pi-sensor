@@ -4,6 +4,7 @@ import datetime
 import requests
 import json
 
+time.sleep(60)
 motion = 0
 def detect():
 	motion = 0

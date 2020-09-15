@@ -92,7 +92,8 @@ def temp1():
    data = request.form
    temp = data['temp']
    humid = data['humd']
-   temp_data1 = "Temperature: " + temp + " Humidity: " + humid + " %"
+
+   temp_data1 = data
 
    if temp is None or humid is None:
       return {"response":"bad request"},400
@@ -136,7 +137,8 @@ def temp2():
    data = request.form
    temp = data['temp']
    humid = data['humd']
-   temp_data2 = "Temperature: " + temp + " Humidity: " + humid + " %"
+
+   temp_data2 = data
 
    if temp is None or humid is None:
       return {"response":"bad request"},400
