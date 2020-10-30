@@ -111,21 +111,21 @@ def temp1():
    except:
       db.rollback()
       print("Error inserting data")
-
+   tempInfo = "Temp is %s and Humidity is %s"%(temp,humid)
    #send out temp alert if we need to
-   if temp < 60.0:
+   if temp < 50.0:
       print("The temp has fallen below an acceptable range send an alert")
-      x = threading.Thread(target=email, args=("Temp has fallen below an acceptable range. The last reading was: ",temp_data1,))
+      x = threading.Thread(target=email, args=("Temp has fallen below an acceptable range. The last reading was: ",tempInfo,))
       x.start()
-   if temp >= 80.0:
+   if temp >= 75.0:
       print("The temp is high sending an alert")
-      x = threading.Thread(target=email, args=("Temp is high. The last reading was: ",temp_data1,))
+      x = threading.Thread(target=email, args=("Temp is high. The last reading was: ",tempInfo,))
       x.start()
    if humid >= 75.0:
-     x = threading.Thread(target=email, args=("Humidity is high. The last reading was: ",temp_data1,))
+     x = threading.Thread(target=email, args=("Humidity is high. The last reading was: ",tempInfo,))
      x.start()
-   if humid <= 35.0:
-     x = threading.Thread(target=email, args=("Humidity is low. The last reading was: ",temp_data1,))
+   if humid <= 30.0:
+     x = threading.Thread(target=email, args=("Humidity is low. The last reading was: ",tempInfo,))
      x.start()
    return {"response":"ok"},200
 
