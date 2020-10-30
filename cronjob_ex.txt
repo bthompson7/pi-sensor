@@ -1,4 +1,5 @@
 @reboot screen -d -m python3 /home/pi/Desktop/python/scripts/motion_detection.py
-@reboot screen -d -m python3 /home/pi/Desktop/python/scripts/read_temp.py
+@reboot screen -d -m python3 /home/pi/Desktop/python/scripts/read_temp1.py
+@reboot screen -d -m python3 /home/pi/Desktop/python/scripts/read_temp2.py
 @reboot screen -d -m python3 /home/pi/Desktop/python/server.py False
 
