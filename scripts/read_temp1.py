@@ -5,9 +5,9 @@ import Adafruit_DHT,time,requests,json
 DHT_SENSOR = Adafruit_DHT.DHT11
 DHT_PIN = 4
 
-#sleep for 30 seconds to wait for the server to start
+#sleep for 300 seconds(5 minutes) to wait for the server to start
 #this is incase power is lost and the entire system needs to reboot
-time.sleep(30)
+time.sleep(300)
 
 while True:
 	humd, temp = Adafruit_DHT.read(DHT_SENSOR, DHT_PIN)
