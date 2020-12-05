@@ -26,8 +26,9 @@ CREATE TABLE `tempdata2` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `temp` float(10,2) DEFAULT NULL,
   `humd` float(10,2) DEFAULT NULL,
+  `date` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6404 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=18028 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,8 +42,9 @@ CREATE TABLE `tempdata3` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `temp` float(10,2) DEFAULT NULL,
   `humd` float(10,2) DEFAULT NULL,
+  `date` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,4 +71,4 @@ CREATE TABLE `well_data` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-07 22:48:17
+-- Dump completed on 2020-12-05 23:57:53
