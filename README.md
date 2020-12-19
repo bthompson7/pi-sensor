@@ -6,9 +6,18 @@
 
 ![Screenshot from 2020-10-25 23-29-04](https://user-images.githubusercontent.com/35780502/97131194-e5165780-1719-11eb-89c6-7d435728d4c7.png)
 
-# Hardware used in this project
-## [Raspberry Pi 3B+](https://www.amazon.com/s?k=raspberry+Pi+3B%2B&ref=nb_sb_noss) but you could probably get away with using a [Raspberry Pi Zero](https://www.amazon.com/s?k=Raspberry+Pi+Zero&ref=nb_sb_noss)
+# Hardware used
 
-## [DHT11](https://www.amazon.com/s?k=dht+11+sensor&ref=nb_sb_noss_2)
+## Running On
 
-## [HC-SR501](https://www.amazon.com/s?k=HC-SR501+sensor&ref=nb_sb_noss)
+## [Raspberry Pi 3B+](https://www.amazon.com/s?k=raspberry+Pi+3B%2B&ref=nb_sb_noss)
+
+## Sensors
+
+## [DHT11 - Temperature & Humidity Sensor](https://www.amazon.com/s?k=dht+11+sensor&ref=nb_sb_noss_2)
+
+## [DHT22 - Temperature & Humidity Sensor](https://www.amazon.com/s?k=dht22&ref=nb_sb_noss_1)
+
+## [HC-SR501 - Motion Sensor](https://www.amazon.com/s?k=HC-SR501+sensor&ref=nb_sb_noss)
+
+## [HC-SR04 - Ultrasonic Sensor](https://www.amazon.com/s?k=HC-SR04&ref=nb_sb_noss)
