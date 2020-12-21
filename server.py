@@ -17,6 +17,7 @@ from flask_caching import Cache
 
 app = Flask(__name__)
 
+sema = threading.Semaphore()
 #database information
 global mysql
 mysql = MySQL()
@@ -188,6 +189,7 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 def db_connect():
+    sema.acquire()
     print("connecting")
     global db
     global cursor
@@ -198,7 +200,9 @@ def db_connect():
         cursor = db.cursor()
         print(cursor)
         print("connected")
+        sema.release()
     except:
+        sema.release()
         print("error connecting")
 
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
