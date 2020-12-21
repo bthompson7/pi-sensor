@@ -1,12 +1,16 @@
 function getTempData(){
+document.getElementById("temp-sensor-1").innerHTML = "Loading...";
+document.getElementById("temp-sensor-2").innerHTML = "Loading...";
 
  //1st temp sensor
  var http = new XMLHttpRequest();
   http.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var tempData1 = JSON.parse(http.response);
-      document.getElementById("temp-sensor-1").innerHTML = tempData1;
-	console.log("RESPONSE = " + tempData1[0][0] + " " + tempData1[0][1]);
+      var tempValue = tempData1[0][0];
+      var humidValue = tempData1[0][1];
+      var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
+      document.getElementById("temp-sensor-1").innerHTML = stringToDisplay;
     }
   };
 
@@ -18,7 +22,10 @@ function getTempData(){
   http2.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var tempData2 = JSON.parse(http2.response)
-      document.getElementById("temp-sensor-2").innerHTML = tempData2;
+      var tempValue = tempData2[0][0];
+      var humidValue = tempData2[0][1];
+      var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
+      document.getElementById("temp-sensor-2").innerHTML = stringToDisplay;
     }
   };
 
@@ -31,7 +38,6 @@ function getTempData(){
 
 getTempData();
 
-//run the function every 5 minutes
 setInterval(function(){
     getTempData();
 }, 300000);

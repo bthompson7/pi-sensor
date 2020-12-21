@@ -18,6 +18,7 @@ from flask_caching import Cache
 app = Flask(__name__)
 
 sema = threading.Semaphore()
+
 #database information
 global mysql
 mysql = MySQL()
@@ -168,8 +169,8 @@ def getTemp2():
 	return jsonify(tempData2), 200
 
 @app.route('/temp1Chart')
-@cache.cached(timeout=300) #300 seconds = 5 mins
-def chart():
+@cache.cached(timeout=600) #600 seconds = 10 mins
+def chart1():
    db_connect()
    print("Request for /chart from ", request.remote_addr)
    select_temp_data = "select * from(select * from tempdata2 order by id desc limit 50)Var1 order by id asc"
@@ -179,6 +180,21 @@ def chart():
    y_val = [temp[1] for temp in data2] #temp
    y_val2 = [humd[2] for humd in data2] #humd
    return render_template("chart.html",**locals())
+
+@app.route('/temp2Chart')
+@cache.cached(timeout=600) #600 seconds = 10 mins
+def chart2():
+   db_connect()
+   print("Request for /chart from ", request.remote_addr)
+   select_temp_data = "select * from(select * from tempdata3 order by id desc limit 50)Var1 order by id asc"
+   cursor.execute(select_temp_data)
+   data2 = cursor.fetchall()
+   x_val = [date[3] for date in data2]
+   y_val = [temp[1] for temp in data2] #temp
+   y_val2 = [humd[2] for humd in data2] #humd
+   return render_template("chart.html",**locals())
+
+
 
 @app.route('/maintenance')
 def maintenance():
@@ -190,20 +206,16 @@ def page_not_found(e):
 
 def db_connect():
     sema.acquire()
-    print("connecting")
     global db
     global cursor
 
     try:
         db = mysql.connect()
-        print(db)
         cursor = db.cursor()
-        print(cursor)
-        print("connected")
         sema.release()
     except:
         sema.release()
-        print("error connecting")
+        print("error connecting to the database.")
 
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
 site = Site(resource)
