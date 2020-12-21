@@ -12,44 +12,19 @@
 <h1 align="center">Basement Sensor</h1>
 <hr>
 
-{% if temp1 is not none %}
 <div class="sensor-info">
-<h2>Temperature: {{temp1['temp']}} &#8457; Humidity: {{temp1['humd']}} %</h2>
+<h2 id="temp-sensor-1"></h2>
 </div>
-{%endif%}
 
-{% if temp2 is not none %}
 <div class="sensor-info">
-<h2>Temperature: {{temp2['temp']}} &#8457; Humidity: {{temp2['humd']}} %</h2>
+<h2 id="temp-sensor-2"></h2>
 </div>
-{%endif%}
 
-{% if motion is not none %}
-<h2>Motion Sensor: {{motion}}</h2>
-{%endif %}
-
-
-<h2 id="timer"></h2>
-<label><input type="checkbox"  id="chkRefresh"/>Autorefresh</label>
 <br>
-<h2>Recent Sensor Readings</h2>
 
-<table class="table table-bordered table-hover">  
-<tr>     
-        <td>Temperature</td> 
-        <td>Humidity</td> 
-</tr>
- 
-{%for res in results%} 
-<tr>
-    <td>{{res[1]}}</td> 
-    <td>{{res[2]}}</td> 
-{%endfor%}   
+<a class="btn btn-primary" href="/temp1Chart"  target="_blank" role="button">Temp Sensor 1 Chart</a>
+<a class="btn btn-primary" href="/temp2Chart" target="_blank" role="button">Temp Sensor 2 Chart</a>
 
-</tr> 
-</table>
-
-<a class="btn btn-primary" href="/chart"  target="_blank" role="button">View Sensor Chart</a>
-<script src="/static/refresh.js"></script>
+<script src="/static/main.js"></script>
 </body>
 </html>

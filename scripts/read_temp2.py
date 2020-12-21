@@ -35,7 +35,7 @@ while True:
 			tempData = {"temp":tempRounded,"humd":humidRounded}
 			json.dumps(tempData)
 			print("Sending request to server")
-			x = requests.post("http://192.168.1.2:5000/temp2",data=tempData)
+			x = requests.post("http://192.168.1.2:5000/updateTemp2",data=tempData)
 			print(x.text)
 		except:
 			print("request failed sleeping. The server must be down")

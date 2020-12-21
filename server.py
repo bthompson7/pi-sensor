@@ -1,22 +1,32 @@
 import Adafruit_DHT
-import time,os,pymysql,json
+import time,os,json
 from flask import Flask,render_template
+
+from flaskext.mysql import MySQL
 from twisted.internet import reactor
 from twisted.web.proxy import ReverseProxyResource
 from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
-from flask import request,Response,redirect,url_for
+
+from flask import request,Response,redirect,url_for,jsonify
 import datetime
 import pytz,sys
 import threading
 from flask_caching import Cache
 
 app = Flask(__name__)
-DHT_SENSOR = Adafruit_DHT.DHT11
-DHT_PIN = 4
-sema = threading.Semaphore()
 
+#database information
+global mysql
+mysql = MySQL()
+app.config['MYSQL_DATABASE_USER'] = 'monitor'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
+app.config['MYSQL_DATABASE_DB'] = 'temps'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)
+
+#cache config
 config = {
     "DEBUG": False,
     "CACHE_TYPE": "simple",
@@ -43,50 +53,16 @@ def check_for_maintenance():
       print("Maintenance mode enabled! Request from ",request.remote_addr)
       return redirect(url_for('maintenance'))
 
-#get 10 most recent readings
-def db_get_data():
-    try:
-        db_con()
-        sqlSelect = "(select * from tempdata2 order by id desc limit 10) UNION (select * from tempdata3 order by id limit 10)"
-        cursor.execute(sqlSelect)
-        res = cursor.fetchall()
-    except:
-        print("Error fetching data")
-    return res
-
 @app.route('/')
 def main():
    print("Request for / from ",request.remote_addr)
-   db_con()
-
-   global motion_data
-   global temp_data1
-   global temp_data2
-
-   results = db_get_data()
-
-   try:
-      temp1 = temp_data1
-   except:
-      temp1 = None
-
-   try:
-      motion = motion_data
-   except:
-      motion = None
-
-   try:
-      temp2 = temp_data2
-   except:
-      temp2 = None
-
-   return render_template("data.html", **locals())
+   return render_template("data.html")
 
 #this function handles incoming http post request from the temp/humd sensor on the pi that runs the server
 #this is so that temp/humd alerts can be sent out
-@app.route("/temp1",methods=['POST'])
+@app.route("/updateTemp1",methods=['POST'])
 def temp1():
-   db_con()
+   db_connect()
    global temp_data1
    data = request.form
    temp = data['temp']
@@ -114,9 +90,9 @@ def temp1():
    return {"response":"200"},200
 
 #this function handes incoming http post requests from another remote temp/humd sensor
-@app.route("/temp2",methods=['POST'])
+@app.route("/updateTemp2",methods=['POST'])
 def temp2():
-   db_con()
+   db_connect()
    global temp_data2
    data = request.form
    temp = data['temp']
@@ -145,23 +121,56 @@ def temp2():
 
 
 #handles incoming http post requests from the remote motion sensor
-@app.route("/motion", methods=['POST'])
+@app.route("/updateMotion", methods=['POST'])
 def motion():
    global motion_data
    motion_data = request.form['motion']
    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
    hour = int(now.hour)
-   if "Lots of motion detected" in motion_data and (hour == 23 or hour == 00 or hour >= 1 and hour <= 5): #Email Alerts are active between 11PM - 6 AM
-      print("Lots of motion detected sending alert...")
-      x = threading.Thread(target=email, args=("Lots of motion detected ",motion_data,))
-      x.start()
    return {"response":"200"}, 200
 
-@app.route('/chart')
+@app.route("/getTemp1", methods=['GET'])
+def getTemp1():
+	try:
+		db_connect()
+		print(db)
+		print(cursor)
+		select1 = "select temp,humd from tempdata2 order by id desc limit 1"
+		cursor.execute(select1)
+		db.commit()
+		print("select was successful!")
+		tempData1 = cursor.fetchall()
+		print(tempData1)
+	except:
+		db.rollback()
+		print("Error selecting data")
+		return jsonify("Error selecting the data 1"), 500
+
+	print(tempData1)
+	return jsonify(tempData1), 200
+
+@app.route("/getTemp2", methods=['GET'])
+def getTemp2():
+	try:
+		db_connect()
+		select2 = "select temp , humd from tempdata3 order by id desc limit 1"
+		cursor.execute(select2)
+		db.commit()
+		print("select was successful!")
+		tempData2 = cursor.fetchall()
+	except:
+		db.rollback()
+		print("Error selecting data")
+		return jsonify("Error selecting the data 2"), 500
+
+	print(tempData2)
+	return jsonify(tempData2), 200
+
+@app.route('/temp1Chart')
 @cache.cached(timeout=300) #300 seconds = 5 mins
 def chart():
+   db_connect()
    print("Request for /chart from ", request.remote_addr)
-   db_con()
    select_temp_data = "select * from(select * from tempdata2 order by id desc limit 50)Var1 order by id asc"
    cursor.execute(select_temp_data)
    data2 = cursor.fetchall()
@@ -178,15 +187,19 @@ def maintenance():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-def db_con():
-    global cursor
+def db_connect():
+    print("connecting")
     global db
-    db = pymysql.connect("localhost","monitor","password","temps")
-    cursor = db.cursor()
+    global cursor
 
-def email(email_msg,sensor_data):
-   email = EmailSender()
-   email.sendEmail(email_msg,sensor_data)
+    try:
+        db = mysql.connect()
+        print(db)
+        cursor = db.cursor()
+        print(cursor)
+        print("connected")
+    except:
+        print("error connecting")
 
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
 site = Site(resource)
