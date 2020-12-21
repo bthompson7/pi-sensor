@@ -7,7 +7,6 @@ from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 from flask import request,Response,redirect,url_for
-from send import *
 import datetime
 import pytz,sys
 import threading
@@ -112,22 +111,7 @@ def temp1():
       db.rollback()
       print("Error inserting data")
    tempInfo = "Temp is %s and Humidity is %s"%(temp,humid)
-   #send out temp alert if we need to
-   if temp < 50.0:
-      print("The temp has fallen below an acceptable range send an alert")
-      x = threading.Thread(target=email, args=("Temp has fallen below an acceptable range. The last reading was: ",tempInfo,))
-      x.start()
-   if temp >= 75.0:
-      print("The temp is high sending an alert")
-      x = threading.Thread(target=email, args=("Temp is high. The last reading was: ",tempInfo,))
-      x.start()
-   if humid >= 75.0:
-     x = threading.Thread(target=email, args=("Humidity is high. The last reading was: ",tempInfo,))
-     x.start()
-   if humid <= 30.0:
-     x = threading.Thread(target=email, args=("Humidity is low. The last reading was: ",tempInfo,))
-     x.start()
-   return {"response":"ok"},200
+   return {"response":"200"},200
 
 #this function handes incoming http post requests from another remote temp/humd sensor
 @app.route("/temp2",methods=['POST'])
@@ -157,23 +141,7 @@ def temp2():
       db.rollback()
       print("Error inserting data")
 
-   #send out temp alert if we need to
-   if temp < 60.0:
-      print("The temp has fallen below an acceptable range send an alert")
-      x = threading.Thread(target=email, args=("Temp has fallen below an acceptable range. The last reading was: ",temp_data1,))
-      x.start()
-   if temp >= 80.0:
-      print("The temp is high sending an alert")
-      x = threading.Thread(target=email, args=("Temp is high. The last reading was: ",temp_data1,))
-      x.start()
-   if humid >= 75.0:
-     x = threading.Thread(target=email, args=("Humidity is high. The last reading was: ",temp_data1,))
-     x.start()
-   if humid <= 35.0:
-     x = threading.Thread(target=email, args=("Humidity is low. The last reading was: ",temp_data1,))
-     x.start()
-
-   return {"response":"ok"},200
+   return {"response":"200"},200
 
 
 #handles incoming http post requests from the remote motion sensor
@@ -187,7 +155,7 @@ def motion():
       print("Lots of motion detected sending alert...")
       x = threading.Thread(target=email, args=("Lots of motion detected ",motion_data,))
       x.start()
-   return {"response": "200"}, 200
+   return {"response":"200"}, 200
 
 @app.route('/chart')
 @cache.cached(timeout=300) #300 seconds = 5 mins

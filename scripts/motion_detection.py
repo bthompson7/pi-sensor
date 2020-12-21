@@ -4,7 +4,7 @@ import datetime
 import requests
 import json
 
-time.sleep(60)
+#time.sleep(60)
 motion = 0
 def detect():
 	motion = 0
@@ -29,6 +29,7 @@ def detect():
 			print(x.text)
 			time.sleep(0.5)
 		except:
+			print("Error!")
 			time.sleep(600)
 
 if __name__ == "__main__":
