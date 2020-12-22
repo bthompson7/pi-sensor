@@ -74,16 +74,16 @@ def temp1():
 
    if temp is None or humid is None:
       return {"response":"bad request"},400
-   print("Working...")
+   #print("Working...")
    temp = float(temp)
    humid = float(humid)
 
    try:
-      print("Inserting data")
+      #print("Inserting data")
       sqlInsert = ("""INSERT INTO tempdata2 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
       cursor.execute(sqlInsert)
       db.commit()
-      print("insert was successful!")
+     #print("insert was successful!")
 
    except:
       db.rollback()
@@ -104,16 +104,16 @@ def temp2():
 
    if temp is None or humid is None:
       return {"response":"bad request"},400
-   print("working...")
+   #print("working...")
    temp = float(temp)
    humid = float(humid)
 
    try:
-      print("inserting data")
+      #print("inserting data")
       sqlInsert = ("""INSERT INTO tempdata3 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
       cursor.execute(sqlInsert)
       db.commit()
-      print("insert was successful!")
+      #print("insert was successful!")
 
    except:
       db.rollback()
@@ -135,37 +135,34 @@ def motion():
 def getTemp1():
 	try:
 		db_connect()
-		print(db)
-		print(cursor)
 		select1 = "select temp,humd from tempdata2 order by id desc limit 1"
 		cursor.execute(select1)
 		db.commit()
-		print("select was successful! 1")
 		tempData1 = cursor.fetchall()
-		print(tempData1)
-	except:
+		#print("Select was successful 1")
+	except Exception as e:
 		db.rollback()
-		print("Error selecting data 1")
-		return jsonify("Error selecting the data 1"), 500
+		print("Error in getTemp1:")
+		print(e)
+		return jsonify(e), 500
 
-	print(tempData1)
 	return jsonify(tempData1), 200
 
 @app.route("/getTemp2", methods=['GET'])
 def getTemp2():
 	try:
 		db_connect()
-		select2 = "select temp , humd from tempdata3 order by id desc limit 1"
+		select2 = "select temp,humd from tempdata3 order by id desc limit 1"
 		cursor.execute(select2)
 		db.commit()
-		print("select was successful! 2")
 		tempData2 = cursor.fetchall()
-	except:
+		#print("Select was successful 2")
+	except Exception as e:
 		db.rollback()
-		print("Error selecting data 2")
-		return jsonify("Error selecting the data 2"), 500
+		print("Error in getTemp2:")
+		print(e)
+		return jsonify(e), 500
 
-	print(tempData2)
 	return jsonify(tempData2), 200
 
 @app.route('/temp1Chart')
@@ -212,10 +209,10 @@ def db_connect():
     try:
         db = mysql.get_db()
         cursor = db.cursor()
-        sema.release()
     except:
-        sema.release()
         print("error connecting to the database.")
+    finally:
+        sema.release()
 
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
 site = Site(resource)
