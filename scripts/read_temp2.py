@@ -31,7 +31,7 @@ while True:
 				in_event_mode = False
 				time_delay = 600
 
-			print("Temp = %s F Humditiy = %s"%(tempRounded,humd))
+			print("Temp = %s F Humditiy = %s"%(tempRounded,humidRounded))
 			tempData = {"temp":tempRounded,"humd":humidRounded}
 			json.dumps(tempData)
 			print("Sending request to server")
