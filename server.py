@@ -140,12 +140,12 @@ def getTemp1():
 		select1 = "select temp,humd from tempdata2 order by id desc limit 1"
 		cursor.execute(select1)
 		db.commit()
-		print("select was successful!")
+		print("select was successful! 1")
 		tempData1 = cursor.fetchall()
 		print(tempData1)
 	except:
 		db.rollback()
-		print("Error selecting data")
+		print("Error selecting data 1")
 		return jsonify("Error selecting the data 1"), 500
 
 	print(tempData1)
@@ -158,11 +158,11 @@ def getTemp2():
 		select2 = "select temp , humd from tempdata3 order by id desc limit 1"
 		cursor.execute(select2)
 		db.commit()
-		print("select was successful!")
+		print("select was successful! 2")
 		tempData2 = cursor.fetchall()
 	except:
 		db.rollback()
-		print("Error selecting data")
+		print("Error selecting data 2")
 		return jsonify("Error selecting the data 2"), 500
 
 	print(tempData2)
@@ -210,7 +210,7 @@ def db_connect():
     global cursor
 
     try:
-        db = mysql.connect()
+        db = mysql.get_db()
         cursor = db.cursor()
         sema.release()
     except:
