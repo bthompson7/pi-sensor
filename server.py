@@ -1,8 +1,8 @@
 import Adafruit_DHT
 import time,os,json
 from flask import Flask,render_template
-
 from flaskext.mysql import MySQL
+
 from twisted.internet import reactor
 from twisted.web.proxy import ReverseProxyResource
 from twisted.web.resource import Resource
@@ -85,9 +85,11 @@ def temp1():
       db.commit()
      #print("insert was successful!")
 
-   except:
+   except Exception as e:
       db.rollback()
-      print("Error inserting data")
+      print("Error in /updateTemp1 endpoint", e)
+      return jsonfiy(e), 500
+
    tempInfo = "Temp is %s and Humidity is %s"%(temp,humid)
    return {"response":"200"},200
 
@@ -103,28 +105,46 @@ def temp2():
    temp_data2 = data
 
    if temp is None or humid is None:
-      return {"response":"bad request"},400
-   #print("working...")
+      return {"response":"Data contains no information"},400
+
    temp = float(temp)
    humid = float(humid)
 
    try:
-      #print("inserting data")
+
       sqlInsert = ("""INSERT INTO tempdata3 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
       cursor.execute(sqlInsert)
       db.commit()
-      #print("insert was successful!")
 
-   except:
+   except Exception as e:
       db.rollback()
-      print("Error inserting data")
+      print("Error in /updateTemp2 endpoint", e)
+      return jsonify(e), 500
 
    return {"response":"200"},200
+
+
+@app.route("/updateSumpLevel")
+def updateSumpLevel():
+    try:
+        water_level = request.form['water_level']
+        db_connect()
+        sqlInsert = ("""INSERT INTO sometable (water_level,date) VALUES(%d,NOW())"""%(water_level))
+        cursor.execute(sqlInsert)
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        print("Error in /updateSumpLevel ", e)
+        return jsonify(e),500
+
+    return {"response":"200"},200
 
 
 #handles incoming http post requests from the remote motion sensor
 @app.route("/updateMotion", methods=['POST'])
 def motion():
+
    global motion_data
    motion_data = request.form['motion']
    now = datetime.datetime.now(pytz.timezone('US/Eastern'))
@@ -139,11 +159,10 @@ def getTemp1():
 		cursor.execute(select1)
 		db.commit()
 		tempData1 = cursor.fetchall()
-		#print("Select was successful 1")
+
 	except Exception as e:
 		db.rollback()
-		print("Error in getTemp1:")
-		print(e)
+		print("Error in /getTemp1 endpoint", e)
 		return jsonify(e), 500
 
 	return jsonify(tempData1), 200
@@ -156,14 +175,14 @@ def getTemp2():
 		cursor.execute(select2)
 		db.commit()
 		tempData2 = cursor.fetchall()
-		#print("Select was successful 2")
+
 	except Exception as e:
 		db.rollback()
-		print("Error in getTemp2:")
-		print(e)
+		print("Error in /getTemp2 endpoint", e)
 		return jsonify(e), 500
 
 	return jsonify(tempData2), 200
+
 
 @app.route('/temp1Chart')
 @cache.cached(timeout=600) #600 seconds = 10 mins

@@ -13,6 +13,8 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
       var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
       document.getElementById("temp-sensor-1").innerHTML = stringToDisplay;
     }else if(this.readyState == 4  && this.status != 200){
+
+	console.log("error = " + http.response);
 	var error = JSON.parse(http.response);
         document.getElementById("temp-sensor-1").innerHTML = error[0];
    }
@@ -33,6 +35,7 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
       var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
       document.getElementById("temp-sensor-2").innerHTML = stringToDisplay;
     }else if(this.readyState == 4 && this.status != 200){
+	console.log("error = " + http2.response);
 	var error = JSON.parse(http2.response);
         document.getElementById("temp-sensor-2").innerHTML = error[0];
     }
