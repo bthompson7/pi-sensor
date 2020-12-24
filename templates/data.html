@@ -6,24 +6,28 @@
 <script src="/static/libs/popper.min.js"></script>
 <script src="/static/libs/jquery.min.js"></script>
 <script src="/static/libs/bootstrap.min.js"></script>
-<title>Basement Sensor</title>
+<title>Smart Home Sensor Network</title>
 </head> 
 <body>
-<h1 align="center">Basement Sensor</h1>
+
+<div class="page-title">
+<h1>Smart Home Sensor Network</h1>
+</div>
 <hr>
 
 <div class="sensor-info">
+<h2 class="sensor-location">Basement Sensor: </h2>
 <h2 id="temp-sensor-1"></h2>
+<a class="btn btn-primary" href="/temp1Chart"  target="_blank" role="button">Basement Sensor Chart</a>
 </div>
 
 <div class="sensor-info">
+<h2 class="sensor-location">Bedroom Sensor: </h2>
 <h2 id="temp-sensor-2"></h2>
+<a class="btn btn-primary" href="/temp2Chart" target="_blank" role="button">Bedroom Sensor Chart</a>
 </div>
 
 <br>
-
-<a class="btn btn-primary" href="/temp1Chart"  target="_blank" role="button">Temp Sensor 1 Chart</a>
-<a class="btn btn-primary" href="/temp2Chart" target="_blank" role="button">Temp Sensor 2 Chart</a>
 
 <script src="/static/main.js"></script>
 </body>

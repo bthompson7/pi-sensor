@@ -74,16 +74,13 @@ def temp1():
 
    if temp is None or humid is None:
       return {"response":"bad request"},400
-   #print("Working...")
    temp = float(temp)
    humid = float(humid)
 
    try:
-      #print("Inserting data")
       sqlInsert = ("""INSERT INTO tempdata2 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
       cursor.execute(sqlInsert)
       db.commit()
-     #print("insert was successful!")
 
    except Exception as e:
       db.rollback()
@@ -195,6 +192,7 @@ def chart1():
    x_val = [date[3] for date in data2]
    y_val = [temp[1] for temp in data2] #temp
    y_val2 = [humd[2] for humd in data2] #humd
+   page_title = "Basement Sensor Chart"
    return render_template("chart.html",**locals())
 
 @app.route('/temp2Chart')
@@ -208,6 +206,7 @@ def chart2():
    x_val = [date[3] for date in data2]
    y_val = [temp[1] for temp in data2] #temp
    y_val2 = [humd[2] for humd in data2] #humd
+   page_title = "Bedroom Sensor Chart"
    return render_template("chart.html",**locals())
 
 

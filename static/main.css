@@ -1,5 +1,19 @@
 .sensor-info{
 
-display:flex;
-margin-bottom: 25px;
+display:block;
+margin-bottom: 35px;
+
+}
+
+
+.sensor-location{
+
+font-weight: bold;
+
+}
+
+.page-title{
+
+text-align: center;
+
 }
