@@ -10,7 +10,7 @@ error_delay = 600
 in_event_mode = False
 
 #sleep incase we lose power and we  need to reboot
-#time.sleep(time_delay)
+time.sleep(time_delay)
 
 while True:
 	humid, temp = Adafruit_DHT.read(DHT_SENSOR, DHT_PIN)

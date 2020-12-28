@@ -202,20 +202,6 @@ def maintenance():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-def db_connect():
-    sema.acquire()
-    global db
-    global cursor
-
-    try:
-        db = mysql.get_db()
-        cursor = db.cursor()
-    except:
-        print("error connecting to the database.")
-    finally:
-        sema.release()
-
-
 def query_db(query):
     sema.acquire()
 
