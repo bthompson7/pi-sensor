@@ -1,25 +1,25 @@
-import Adafruit_DHT
-import time,os,json
+#other imports we need
+import time, os, json, re, Adafruit_DHT
+import datetime, pytz, sys, threading
+
+#flask imports
 from flask import Flask,render_template
+from flask import request,Response,redirect,url_for,jsonify
+from flask_caching import Cache
+
+#mysql
 from flaskext.mysql import MySQL
 
+#twisted web server
 from twisted.internet import reactor
 from twisted.web.proxy import ReverseProxyResource
 from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
-from flask import request,Response,redirect,url_for,jsonify
-import datetime
-import pytz,sys
-import threading
-from flask_caching import Cache
-
 app = Flask(__name__)
-
 sema = threading.Semaphore()
 
-#database information
 global mysql
 mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'monitor'
@@ -63,8 +63,7 @@ def main():
 #this function handles incoming http post request from the temp/humd sensor on the pi that runs the server
 #this is so that temp/humd alerts can be sent out
 @app.route("/updateTemp1",methods=['POST'])
-def temp1():
-   db_connect()
+def updateTemp1():
    global temp_data1
    data = request.form
    temp = data['temp']
@@ -79,11 +78,9 @@ def temp1():
 
    try:
       sqlInsert = ("""INSERT INTO tempdata2 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
-      cursor.execute(sqlInsert)
-      db.commit()
+      result = query_db(sqlInsert)
 
    except Exception as e:
-      db.rollback()
       print("Error in /updateTemp1 endpoint", e)
       return jsonfiy(e), 500
 
@@ -92,8 +89,7 @@ def temp1():
 
 #this function handes incoming http post requests from another remote temp/humd sensor
 @app.route("/updateTemp2",methods=['POST'])
-def temp2():
-   db_connect()
+def updateTemp2():
    global temp_data2
    data = request.form
    temp = data['temp']
@@ -108,13 +104,11 @@ def temp2():
    humid = float(humid)
 
    try:
-
       sqlInsert = ("""INSERT INTO tempdata3 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
-      cursor.execute(sqlInsert)
-      db.commit()
+      query_db(sqlInsert)
 
    except Exception as e:
-      db.rollback()
+
       print("Error in /updateTemp2 endpoint", e)
       return jsonify(e), 500
 
@@ -124,14 +118,12 @@ def temp2():
 @app.route("/updateSumpLevel")
 def updateSumpLevel():
     try:
+
         water_level = request.form['water_level']
-        db_connect()
         sqlInsert = ("""INSERT INTO sometable (water_level,date) VALUES(%d,NOW())"""%(water_level))
-        cursor.execute(sqlInsert)
-        db.commit()
+        query_db(sqlInsert)
 
     except Exception as e:
-        db.rollback()
         print("Error in /updateSumpLevel ", e)
         return jsonify(e),500
 
@@ -140,7 +132,7 @@ def updateSumpLevel():
 
 #handles incoming http post requests from the remote motion sensor
 @app.route("/updateMotion", methods=['POST'])
-def motion():
+def updateMotion():
 
    global motion_data
    motion_data = request.form['motion']
@@ -151,14 +143,11 @@ def motion():
 @app.route("/getTemp1", methods=['GET'])
 def getTemp1():
 	try:
-		db_connect()
+
 		select1 = "select temp,humd from tempdata2 order by id desc limit 1"
-		cursor.execute(select1)
-		db.commit()
-		tempData1 = cursor.fetchall()
+		tempData1 = query_db(select1)
 
 	except Exception as e:
-		db.rollback()
 		print("Error in /getTemp1 endpoint", e)
 		return jsonify(e), 500
 
@@ -167,11 +156,8 @@ def getTemp1():
 @app.route("/getTemp2", methods=['GET'])
 def getTemp2():
 	try:
-		db_connect()
 		select2 = "select temp,humd from tempdata3 order by id desc limit 1"
-		cursor.execute(select2)
-		db.commit()
-		tempData2 = cursor.fetchall()
+		tempData2 = query_db(select2)
 
 	except Exception as e:
 		db.rollback()
@@ -184,32 +170,29 @@ def getTemp2():
 @app.route('/temp1Chart')
 @cache.cached(timeout=600) #600 seconds = 10 mins
 def chart1():
-   db_connect()
    print("Request for /chart from ", request.remote_addr)
    select_temp_data = "select * from(select * from tempdata2 order by id desc limit 50)Var1 order by id asc"
-   cursor.execute(select_temp_data)
-   data2 = cursor.fetchall()
+   data2 = query_db(select_temp_data)
+
    x_val = [date[3] for date in data2]
    y_val = [temp[1] for temp in data2] #temp
    y_val2 = [humd[2] for humd in data2] #humd
    page_title = "Basement Sensor Chart"
+
    return render_template("chart.html",**locals())
 
 @app.route('/temp2Chart')
 @cache.cached(timeout=600) #600 seconds = 10 mins
 def chart2():
-   db_connect()
-   print("Request for /chart from ", request.remote_addr)
+
    select_temp_data = "select * from(select * from tempdata3 order by id desc limit 50)Var1 order by id asc"
-   cursor.execute(select_temp_data)
-   data2 = cursor.fetchall()
+   data2 = query_db(select_temp_data)
+
    x_val = [date[3] for date in data2]
    y_val = [temp[1] for temp in data2] #temp
    y_val2 = [humd[2] for humd in data2] #humd
    page_title = "Bedroom Sensor Chart"
    return render_template("chart.html",**locals())
-
-
 
 @app.route('/maintenance')
 def maintenance():
@@ -231,6 +214,41 @@ def db_connect():
         print("error connecting to the database.")
     finally:
         sema.release()
+
+
+def query_db(query):
+    sema.acquire()
+
+    try:
+
+        query_result = "ok"
+
+        db = mysql.get_db()
+        cursor = db.cursor()
+
+        parsed_query = re.split("\s",query)
+
+        if parsed_query[0] == "SELECT" or parsed_query[0] == "select":
+            cursor.execute(query)
+            db.commit()
+            query_result = cursor.fetchall()
+
+        else:
+            cursor.execute(query)
+            db.commit()
+
+    except Exception as e:
+
+        print("error querying the databse", e)
+        query_result = "error"
+        return query_result
+
+    finally:
+        sema.release()
+
+    return query_result
+
+
 
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
 site = Site(resource)

@@ -10,7 +10,7 @@ error_delay = 600
 in_event_mode = False
 
 #in case we lose power wait for the router and everything else to come back online
-time.sleep(600)
+time.sleep(time_delay)
 
 while True:
 	humid, temp = Adafruit_DHT.read(DHT_SENSOR, DHT_PIN)
