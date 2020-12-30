@@ -122,7 +122,7 @@ def updateSumpLevel():
 @app.route("/getTemp1", methods=['GET'])
 def getTemp1():
 	try:
-		select1 = "select temp,humd from tempdata2 order by id desc limit 1"
+		select1 = "select temp,humd,date from tempdata2 order by id desc limit 1"
 		tempData1 = query_db(select1)
 
 	except Exception as e:
@@ -134,7 +134,7 @@ def getTemp1():
 @app.route("/getTemp2", methods=['GET'])
 def getTemp2():
 	try:
-		select2 = "select temp,humd from tempdata3 order by id desc limit 1"
+		select2 = "select temp,humd,date from tempdata3 order by id desc limit 1"
 		tempData2 = query_db(select2)
 
 	except Exception as e:
