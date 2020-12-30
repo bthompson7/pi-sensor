@@ -60,19 +60,14 @@ def main():
    print("Request for / from ",request.remote_addr)
    return render_template("data.html")
 
-#this function handles incoming http post request from the temp/humd sensor on the pi that runs the server
-#this is so that temp/humd alerts can be sent out
 @app.route("/updateTemp1",methods=['POST'])
 def updateTemp1():
-   global temp_data1
-   data = request.form
-   temp = data['temp']
-   humid = data['humd']
-
-   temp_data1 = data
+   sensor_data = request.form
+   temp = sensor_data['temp']
+   humid = sensor_data['humd']
 
    if temp is None or humid is None:
-      return {"response":"bad request"},400
+      return {"response":"Data contains no information"},400
    temp = float(temp)
    humid = float(humid)
 
@@ -84,18 +79,13 @@ def updateTemp1():
       print("Error in /updateTemp1 endpoint", e)
       return jsonfiy(e), 500
 
-   tempInfo = "Temp is %s and Humidity is %s"%(temp,humid)
-   return {"response":"200"},200
+   return {"response": result},200
 
-#this function handes incoming http post requests from another remote temp/humd sensor
 @app.route("/updateTemp2",methods=['POST'])
 def updateTemp2():
-   global temp_data2
-   data = request.form
-   temp = data['temp']
-   humid = data['humd']
-
-   temp_data2 = data
+   sensor_data = request.form
+   temp = sensor_data['temp']
+   humid = sensor_data['humd']
 
    if temp is None or humid is None:
       return {"response":"Data contains no information"},400
@@ -105,14 +95,14 @@ def updateTemp2():
 
    try:
       sqlInsert = ("""INSERT INTO tempdata3 (temp,humd,date) VALUES(%d,%d,NOW())"""%(temp,humid))
-      query_db(sqlInsert)
+      result = query_db(sqlInsert)
 
    except Exception as e:
 
       print("Error in /updateTemp2 endpoint", e)
       return jsonify(e), 500
 
-   return {"response":"200"},200
+   return {"response":result},200
 
 
 @app.route("/updateSumpLevel")
@@ -129,21 +119,9 @@ def updateSumpLevel():
 
     return {"response":"200"},200
 
-
-#handles incoming http post requests from the remote motion sensor
-@app.route("/updateMotion", methods=['POST'])
-def updateMotion():
-
-   global motion_data
-   motion_data = request.form['motion']
-   now = datetime.datetime.now(pytz.timezone('US/Eastern'))
-   hour = int(now.hour)
-   return {"response":"200"}, 200
-
 @app.route("/getTemp1", methods=['GET'])
 def getTemp1():
 	try:
-
 		select1 = "select temp,humd from tempdata2 order by id desc limit 1"
 		tempData1 = query_db(select1)
 
@@ -226,8 +204,7 @@ def query_db(query):
     except Exception as e:
 
         print("error querying the databse", e)
-        query_result = "error"
-        return query_result
+        raise Exception(e)
 
     finally:
         sema.release()
