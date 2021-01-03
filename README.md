@@ -16,5 +16,3 @@
 ## Sensors
 
 ## [DHT22 - Temperature & Humidity Sensor](https://www.amazon.com/s?k=dht22&ref=nb_sb_noss_1)
-
-## [HC-SR501 - Motion Sensor](https://www.amazon.com/s?k=HC-SR501+sensor&ref=nb_sb_noss)
