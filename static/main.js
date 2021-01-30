@@ -8,9 +8,9 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
 
     if (this.readyState == 4 && this.status == 200) {
       var tempData1 = JSON.parse(http.response);
-      var tempValue = tempData1[0][0];
-      var humidValue = tempData1[0][1];
-      var date = tempData1[0][2];
+      var tempValue = tempData1['temp'];
+      var humidValue = tempData1['humid'];
+      var date = tempData1['last_updated'];
 
       var sensorInfoElement = document.getElementsByClassName("sensor-info-1")[0];
 
@@ -47,9 +47,9 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
 
     if (this.readyState == 4 && this.status == 200) {
       var tempData2 = JSON.parse(http2.response)
-      var tempValue = tempData2[0][0];
-      var humidValue = tempData2[0][1];
-      var date = tempData2[0][2];
+      var tempValue = tempData2['temp'];
+      var humidValue = tempData2['humid'];
+      var date = tempData2['last_updated'];
 
         var sensorInfoElement = document.getElementsByClassName("sensor-info-2")[0];
 

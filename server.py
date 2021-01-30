@@ -17,6 +17,9 @@ from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
+#model classes
+from sensor_model import Sensor
+
 app = Flask(__name__)
 sema = threading.Semaphore()
 
@@ -128,8 +131,8 @@ def getTemp1():
 	except Exception as e:
 		print("Error in /getTemp1 endpoint", e)
 		return jsonify(e), 500
-
-	return jsonify(tempData1), 200
+	s = Sensor(tempData1[0][0],tempData1[0][1],tempData1[0][2])
+	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time}, 200
 
 @app.route("/getTemp2", methods=['GET'])
 def getTemp2():
@@ -142,8 +145,8 @@ def getTemp2():
 		print("Error in /getTemp2 endpoint", e)
 		return jsonify(e), 500
 
-	return jsonify(tempData2), 200
-
+	s = Sensor(tempData2[0][0],tempData2[0][1],tempData2[0][2])
+	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time}, 200
 
 @app.route('/temp1Chart')
 @cache.cached(timeout=600) #600 seconds = 10 mins
