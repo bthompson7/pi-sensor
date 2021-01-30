@@ -11,8 +11,8 @@
 
 ## Running On
 
-## [Raspberry Pi 3B+](https://www.amazon.com/s?k=raspberry+Pi+3B%2B&ref=nb_sb_noss)
+## 2 - [Raspberry Pi 3B+](https://www.amazon.com/s?k=raspberry+Pi+3B%2B&ref=nb_sb_noss)
 
 ## Sensors
 
-## [DHT22 - Temperature & Humidity Sensor](https://www.amazon.com/s?k=dht22&ref=nb_sb_noss_1)
+## 2 - [DHT22 - Temperature & Humidity Sensor](https://www.amazon.com/s?k=dht22&ref=nb_sb_noss_1)
