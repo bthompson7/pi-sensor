@@ -1,7 +1,7 @@
 [![StackShare](http://img.shields.io/badge/tech-stack-0690fa.svg?style=flat)](https://stackshare.io/bthompson7/pi-sensor)
 
 # Screenshots
-![Screenshot from 2020-12-27 18-03-04](https://user-images.githubusercontent.com/35780502/103181308-ccd3cd80-486d-11eb-91a5-46dfd78a3214.png)
+![Screenshot from 2021-02-02 15-47-23](https://user-images.githubusercontent.com/35780502/106660447-fe773d00-656d-11eb-8624-341a7942af54.png)
 
 ![Screenshot from 2020-12-27 17-59-26](https://user-images.githubusercontent.com/35780502/103181265-664eaf80-486d-11eb-8b2c-5d27e6961629.png)
 ![Screenshot from 2020-12-27 17-59-52](https://user-images.githubusercontent.com/35780502/103181267-677fdc80-486d-11eb-9697-683e7f50e10e.png)
