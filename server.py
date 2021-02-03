@@ -152,7 +152,7 @@ def getTemp2():
 @cache.cached(timeout=600) #600 seconds = 10 mins
 def chart1():
    print("Request for /chart from ", request.remote_addr)
-   select_temp_data = "select * from(select * from tempdata2 order by id desc limit 50)Var1 order by id asc"
+   select_temp_data = "select * from(select * from tempdata2 order by id desc limit 60)Var1 order by id asc"
    data2 = query_db(select_temp_data)
 
    x_val = [date[3] for date in data2]
@@ -166,7 +166,7 @@ def chart1():
 @cache.cached(timeout=600) #600 seconds = 10 mins
 def chart2():
 
-   select_temp_data = "select * from(select * from tempdata3 order by id desc limit 50)Var1 order by id asc"
+   select_temp_data = "select * from(select * from tempdata3 order by id desc limit 60)Var1 order by id asc"
    data2 = query_db(select_temp_data)
 
    x_val = [date[3] for date in data2]
@@ -195,7 +195,7 @@ def query_db(query):
 
         parsed_query = re.split("\s",query)
 
-        if parsed_query[0] == "SELECT" or parsed_query[0] == "select":
+        if parsed_query[0].lower() == "select":
             cursor.execute(query)
             db.commit()
             query_result = cursor.fetchall()
@@ -215,7 +215,7 @@ def query_db(query):
     return query_result
 
 
-
+#web server
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
 site = Site(resource)
 reactor.listenTCP(5000, site)
