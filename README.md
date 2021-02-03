@@ -1,3 +1,7 @@
+# About
+
+## A web application which provides real time temperature and humidity readings of a house.
+
 [![StackShare](http://img.shields.io/badge/tech-stack-0690fa.svg?style=flat)](https://stackshare.io/bthompson7/pi-sensor)
 
 # Screenshots
@@ -11,8 +15,8 @@
 
 ## Running On
 
-## 2 - [Raspberry Pi 3B+](https://www.amazon.com/s?k=raspberry+Pi+3B%2B&ref=nb_sb_noss)
+### 2 - [Raspberry Pi 3B+](https://www.amazon.com/s?k=raspberry+Pi+3B%2B&ref=nb_sb_noss)
 
 ## Sensors
 
-## 2 - [DHT22 - Temperature & Humidity Sensor](https://www.amazon.com/s?k=dht22&ref=nb_sb_noss_1)
+### 2 - [DHT22 - Temperature & Humidity Sensor](https://www.amazon.com/s?k=dht22&ref=nb_sb_noss_1)
