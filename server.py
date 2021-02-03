@@ -31,7 +31,7 @@ app.config['MYSQL_DATABASE_DB'] = 'temps'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
-#cache config
+#cache config.
 config = {
     "DEBUG": False,
     "CACHE_TYPE": "simple",
