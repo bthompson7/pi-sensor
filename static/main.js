@@ -15,7 +15,7 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
       var sensorInfoElement = document.getElementsByClassName("sensor-info-1")[0];
 
 
- 	   if(date - currentTimeUnix() >= 3600){ ////3600 is one hour in unix time https://www.epochconverter.com/
+ 	   if(date - currentTimeUnix() >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
 	     console.log("Data is an hour old.");
 	    sensorInfoElement.hidden = true;
     	   }else{
@@ -111,3 +111,93 @@ setInterval(function(){
 
 
 
+function setCookie(cname,cvalue,exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  var expires = "expires=" + d.toGMTString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = "expires="+d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+
+function darkMode(){
+var isDarkMode = getCookie("mode");
+
+if(isDarkMode === ""){
+  console.log("creating cookie");
+  setCookie("mode", "dark", 365);
+  var element = document.body;
+  element.classList.toggle("dark-mode");
+}
+
+
+
+if(isDarkMode == "light"){
+  setCookie("mode", "dark", 365);
+  var element = document.body;
+  element.classList.toggle("dark-mode");
+
+}else if(isDarkMode == "dark"){
+  setCookie("mode", "light", 365);
+   var element = document.body;
+   element.classList.toggle("dark-mode");
+
+}
+
+console.log(isDarkMode);
+
+}
+
+
+function bodyLoadDarkMode(){
+
+var isDarkMode = getCookie("mode");
+
+if(isDarkMode == "dark"){
+var element = document.body;
+element.classList.toggle("dark-mode");
+
+}
+
+
+}
+
+bodyLoadDarkMode();
