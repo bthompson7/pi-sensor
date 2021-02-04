@@ -3,7 +3,7 @@
 ## A web application which provides real time temperature and humidity readings of a house.
 [![StackShare](http://img.shields.io/badge/tech-stack-0690fa.svg?style=flat)](https://stackshare.io/bthompson7/pi-sensor)
 
-## If you're interested in the data collected so far [click here](https://raw.githubusercontent.com/bthompson7/pi-sensor/master/database/temps_db.sql) This will be automatically updated every day at 2 AM EST.
+## If you're interested in the data collected so far [click here](https://raw.githubusercontent.com/bthompson7/pi-sensor/master/database/temps_db.sql).
 
 # Screenshots
 ![Screenshot from 2021-02-02 15-47-23](https://user-images.githubusercontent.com/35780502/106660447-fe773d00-656d-11eb-8624-341a7942af54.png)
