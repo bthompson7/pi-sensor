@@ -15,6 +15,6 @@ cd /home/pi/Desktop/python
 
 #you must have an ssh key otherwise this will fail
 git add $backup_dir
-git commit -m "Database backup "
+git commit -m "Nightly automatic database backup"
 git push
 
