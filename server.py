@@ -80,6 +80,8 @@ def updateTemp1():
 
    except Exception as e:
       print("Error in /updateTemp1 endpoint", e)
+      insertError = """INSERT INTO api_errors (error_msg,error_time) values("Error in endpoint /updateTemp1",NOW())"""
+      result = query_db(insertError)
       return jsonfiy(e), 500
 
    return {"response": result},200
@@ -103,6 +105,8 @@ def updateTemp2():
    except Exception as e:
 
       print("Error in /updateTemp2 endpoint", e)
+      insertError = """INSERT INTO api_errors (error_msg,error_time) values("Error in endpoint /updateTemp2",NOW())"""
+      result = query_db(insertError)
       return jsonify(e), 500
 
    return {"response":result},200
@@ -130,7 +134,10 @@ def getTemp1():
 
 	except Exception as e:
 		print("Error in /getTemp1 endpoint", e)
+		insertError = """INSERT INTO api_errors (error_msg,error_time) values("Error in endpoint /updateTemp1",NOW())"""
+		result = query_db(insertError)
 		return jsonify(e), 500
+
 	s = Sensor(tempData1[0][0],tempData1[0][1],tempData1[0][2])
 	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time}, 200
 
@@ -139,10 +146,10 @@ def getTemp2():
 	try:
 		select2 = "select temp,humd,unix_timestamp(date) from tempdata3 order by id desc limit 1"
 		tempData2 = query_db(select2)
-
 	except Exception as e:
-		db.rollback()
 		print("Error in /getTemp2 endpoint", e)
+		insertError = """INSERT INTO api_errors (error_msg,error_time) values("Error in endpoint /getTemp2",NOW())"""
+		result = query_db(insertError)
 		return jsonify(e), 500
 
 	s = Sensor(tempData2[0][0],tempData2[0][1],tempData2[0][2])
