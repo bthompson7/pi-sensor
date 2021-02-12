@@ -155,6 +155,17 @@ def getTemp2():
 	s = Sensor(tempData2[0][0],tempData2[0][1],tempData2[0][2])
 	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time}, 200
 
+
+@app.route("/getErrors",methods=['GET'])
+def getErrors():
+	try:
+		select = "select * from api_errors order by id desc limit 25"
+		data = query_db(select)
+	except Exception as e:
+		print("error selecting data")
+		return jsonify(e), 500
+	return jsonify(data)
+
 @app.route('/temp1Chart')
 @cache.cached(timeout=600) #600 seconds = 10 mins
 def chart1():
