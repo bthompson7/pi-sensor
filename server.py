@@ -117,7 +117,7 @@ def updateSumpLevel():
     try:
 
         water_level = request.form['water_level']
-        sqlInsert = ("""INSERT INTO sometable (water_level,date) VALUES(%d,NOW())"""%(water_level))
+        sqlInsert = ("""INSERT INTO well_data (water_level,date) VALUES(%d,NOW())"""%(water_level))
         query_db(sqlInsert)
 
     except Exception as e:

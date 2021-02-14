@@ -14,8 +14,8 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
 
       var sensorInfoElement = document.getElementsByClassName("sensor-info-1")[0];
 
-
- 	   if(date - currentTimeUnix() >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
+	   console.log(currentTimeUnix() - date);
+ 	   if(currentTimeUnix() - date >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
 	     console.log("Data is an hour old.");
 	    sensorInfoElement.hidden = true;
     	   }else{
@@ -53,7 +53,8 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
 
         var sensorInfoElement = document.getElementsByClassName("sensor-info-2")[0];
 
-           if(date - currentTimeUnix() >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
+	   console.log(currentTimeUnix() - date);
+           if(currentTimeUnix() - date >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
             console.log("Data is an hour old.");
             sensorInfoElement.hidden = true;
            }else{
