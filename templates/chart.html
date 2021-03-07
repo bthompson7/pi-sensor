@@ -2,6 +2,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/static/libs/bootstrap.min.css">
+<link rel="stylesheet" href="/static/main.css">
 <script src="/static/libs/Chart.bundle.min.js"></script>
 <title>{{page_title}}</title>
 </head> 
@@ -11,9 +12,42 @@
 <canvas id="myChart" width="200" height="200"></canvas>
 <script>
 
+
+
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function bodyLoadDarkMode(){
+
+var isDarkMode = getCookie("mode");
+
+if(isDarkMode == "dark"){
+var element = document.body;
+element.classList.toggle("dark-mode");
+
+}
+
+
+}
+
+bodyLoadDarkMode();
+
 var ctx = document.getElementById('myChart');
 
-var chart = new Chart(document.getElementById("myChart"),
+var chart = new Chart(ctx,
 {"type":"line","data":
 {"labels":{{x_val|tojson}},
 "datasets":[{"label":"Temperature (Fahrenheit)",
@@ -33,6 +67,7 @@ var chart = new Chart(document.getElementById("myChart"),
         }
     }
 });
+
 </script>
 </body>
 </html>
