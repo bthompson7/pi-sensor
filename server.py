@@ -129,7 +129,7 @@ def updateSumpLevel():
 @app.route("/getTemp1", methods=['GET'])
 def getTemp1():
 	try:
-		select1 = "select temp,humd,UNIX_TIMESTAMP(date) from tempdata2 order by id desc limit 1"
+		select1 = "select temp,humd,UNIX_TIMESTAMP(date),convert_tz(date,'+00:00','-05:00') from tempdata2 order by id desc limit 1"
 		tempData1 = query_db(select1)
 
 	except Exception as e:
@@ -138,13 +138,13 @@ def getTemp1():
 		result = query_db(insertError)
 		return jsonify(e), 500
 
-	s = Sensor(tempData1[0][0],tempData1[0][1],tempData1[0][2])
-	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time}, 200
+	s = Sensor(tempData1[0][0],tempData1[0][1],tempData1[0][2],tempData1[0][3])
+	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time_unix,"last_updated_normal":s.time_normal}, 200
 
 @app.route("/getTemp2", methods=['GET'])
 def getTemp2():
 	try:
-		select2 = "select temp,humd,unix_timestamp(date) from tempdata3 order by id desc limit 1"
+		select2 = "select temp,humd,UNIX_TIMESTAMP(date),convert_tz(date,'+00:00','-05:00') from tempdata3 order by id desc limit 1"
 		tempData2 = query_db(select2)
 	except Exception as e:
 		print("Error in /getTemp2 endpoint", e)
@@ -152,8 +152,8 @@ def getTemp2():
 		result = query_db(insertError)
 		return jsonify(e), 500
 
-	s = Sensor(tempData2[0][0],tempData2[0][1],tempData2[0][2])
-	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time}, 200
+	s = Sensor(tempData2[0][0],tempData2[0][1],tempData2[0][2],tempData2[0][3])
+	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time_unix,"last_updated_normal":s.time_normal}, 200
 
 
 @app.route("/getErrors",methods=['GET'])
