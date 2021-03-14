@@ -1,6 +1,6 @@
 function getTempData(){
-document.getElementById("temp-sensor-1").innerHTML = "Loading...";
-document.getElementById("temp-sensor-2").innerHTML = "Loading...";
+document.getElementById("temp-sensor-1").innerHTML = "Loading Data...";
+document.getElementById("temp-sensor-2").innerHTML = "Loading Data...";
 
  //1st temp sensor
  var http = new XMLHttpRequest();
@@ -11,11 +11,11 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
       var tempValue = tempData1['temp'];
       var humidValue = tempData1['humid'];
       var date = tempData1['last_updated'];
-
       var sensorInfoElement = document.getElementsByClassName("sensor-info-1")[0];
+      var time = currentTimeUnix() - date;
+      console.log("Time is " + time);
 
-	   console.log(currentTimeUnix() - date);
- 	   if(currentTimeUnix() - date >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
+ 	   if(time >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
 	     console.log("Data is an hour old.");
 	    sensorInfoElement.hidden = true;
     	   }else{
@@ -24,6 +24,7 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
               if(sensorInfoElement.hidden){
 		sensorInfoElement.hidden = false;
                }
+
      	      var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
       	      document.getElementById("temp-sensor-1").innerHTML = stringToDisplay;
        	   }
@@ -31,7 +32,7 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
 
     }else if(this.readyState == 4  && this.status != 200){
 
-	console.log("error = " + http.response);
+	console.error(http.response);
         document.getElementById("temp-sensor-1").innerHTML = http.response;
    }
 
@@ -49,11 +50,11 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
       var tempValue = tempData2['temp'];
       var humidValue = tempData2['humid'];
       var date = tempData2['last_updated'];
+      var sensorInfoElement = document.getElementsByClassName("sensor-info-2")[0];
+      var time = currentTimeUnix() - date;
+      console.log("Time is " + time);
 
-        var sensorInfoElement = document.getElementsByClassName("sensor-info-2")[0];
-
-	   console.log(currentTimeUnix() - date);
-           if(currentTimeUnix() - date >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
+           if(time>= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
             console.log("Data is an hour old.");
             sensorInfoElement.hidden = true;
            }else{
@@ -68,7 +69,7 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading...";
 
 
     }else if(this.readyState == 4 && this.status != 200){
-	console.log("error = " + http2.response);
+	console.error(http2.response);
         document.getElementById("temp-sensor-2").innerHTML = http2.response;
     }
 
