@@ -10,25 +10,14 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading Data...";
       var tempData1 = JSON.parse(http.response);
       var tempValue = tempData1['temp'];
       var humidValue = tempData1['humid'];
-      var date = tempData1['last_updated'];
+      var unixTime = tempData1['last_updated'];
       var sensorInfoElement = document.getElementsByClassName("sensor-info-1")[0];
-      var time = currentTimeUnix() - date;
-      console.log("Time is " + time);
 
- 	   if(time >= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
-	     console.log("Data is an hour old.");
-	    sensorInfoElement.hidden = true;
-    	   }else{
-              console.log("data is up to date");
+      var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
+      document.getElementById("temp-sensor-1").innerHTML = stringToDisplay;
 
-              if(sensorInfoElement.hidden){
-		sensorInfoElement.hidden = false;
-               }
-
-     	      var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
-      	      document.getElementById("temp-sensor-1").innerHTML = stringToDisplay;
-       	   }
-
+      document.getElementById("last-updated-1").innerHTML = "Last Updated: " + timeSince(unixTime);
+      document.getElementById("hidden-time-1").innerHTML = unixTime;
 
     }else if(this.readyState == 4  && this.status != 200){
 
@@ -49,23 +38,14 @@ document.getElementById("temp-sensor-2").innerHTML = "Loading Data...";
       var tempData2 = JSON.parse(http2.response)
       var tempValue = tempData2['temp'];
       var humidValue = tempData2['humid'];
-      var date = tempData2['last_updated'];
+      var dewPointValue = tempData2['dew_point']
+      var unixTime  = tempData2['last_updated'];
       var sensorInfoElement = document.getElementsByClassName("sensor-info-2")[0];
-      var time = currentTimeUnix() - date;
-      console.log("Time is " + time);
 
-           if(time>= 3600){ //3600 is one hour in unix time https://www.epochconverter.com/
-            console.log("Data is an hour old.");
-            sensorInfoElement.hidden = true;
-           }else{
-              console.log("data is up to date");
-
-              if(sensorInfoElement.hidden){
-                sensorInfoElement.hidden = false;
-               }
-              var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
-              document.getElementById("temp-sensor-2").innerHTML = stringToDisplay;
-           }
+      var stringToDisplay = "Temperature: " + tempValue + "&#176;F   " + " Humidity: " + humidValue + "%";
+      document.getElementById("temp-sensor-2").innerHTML = stringToDisplay;
+      document.getElementById("last-updated-2").innerHTML = "Last Updated: " + timeSince(unixTime);
+      document.getElementById("hidden-time-2").innerHTML = unixTime;
 
 
     }else if(this.readyState == 4 && this.status != 200){
@@ -102,13 +82,62 @@ return Math.floor(new Date().getTime()/1000.0);
 
 }
 
-
+// Inital page load
 getTempData();
 
-setInterval(function(){
-    getTempData();
-}, 300000);
+setInterval(getTempData, 300000);
+setInterval(renderTimeSince, 1000);
 
+function renderTimeSince(unixTime) {
+  var sensorTime1 = document.getElementById("hidden-time-1").innerHTML;
+  var sensorTime2 = document.getElementById("hidden-time-2").innerHTML;
+  document.getElementById("last-updated-1").innerHTML = "Last Updated: " + timeSince(sensorTime1);
+  document.getElementById("last-updated-2").innerHTML = "Last Updated: " + timeSince(sensorTime2);
+}
+
+// Please ignore this disaster
+function timeSince(date) {
+
+  var seconds = Math.floor((new Date() - date) / 1000);
+  var intervalType;
+
+  var interval = Math.floor(seconds / 31536000);
+  if (interval >= 1) {
+    intervalType = 'year';
+  } else {
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      intervalType = 'month';
+    } else {
+      interval = Math.floor(seconds / 86400);
+      if (interval >= 1) {
+        intervalType = 'day';
+      } else {
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) {
+          intervalType = "hour";
+        } else {
+          interval = Math.floor(seconds / 60);
+          if (interval >= 1) {
+            intervalType = "minute";
+          } else {
+            interval = seconds;
+            intervalType = "second";
+          }
+        }
+      }
+    }
+  }
+
+   if (interval > 1 || interval === 0) {
+    intervalType += 's ago';
+  } else if (interval == 1) {
+    intervalType += ' ago';
+  }
+
+
+  return interval + ' ' + intervalType;
+}
 
 
 function setCookie(cname,cvalue,exdays) {

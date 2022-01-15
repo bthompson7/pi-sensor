@@ -1,5 +1,5 @@
 class Sensor:
-	def __init__(self,temp,humid,time_unix,time_normal):
+	def __init__(self,temp,humid, time_unix,time_normal):
 		self.temp = temp
 		self.humid = humid
 		self.time_unix = time_unix

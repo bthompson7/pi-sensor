@@ -1,5 +1,5 @@
 #other imports we need
-import time, os, json, re, Adafruit_DHT
+import math,time, os, json, re, Adafruit_DHT
 import datetime, pytz, sys, threading
 
 #flask imports
@@ -17,7 +17,7 @@ from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
 
-#model classes
+#model
 from sensor_model import Sensor
 
 app = Flask(__name__)
@@ -129,7 +129,7 @@ def updateSumpLevel():
 @app.route("/getTemp1", methods=['GET'])
 def getTemp1():
 	try:
-		select1 = "select temp,humd,UNIX_TIMESTAMP(date),convert_tz(date,'+00:00','-05:00') from tempdata2 order by id desc limit 1"
+		select1 = "select temp,humd,UNIX_TIMESTAMP(date) * 1000,convert_tz(date,'+00:00','-05:00') from tempdata2 order by id desc limit 1"
 		tempData1 = query_db(select1)
 
 	except Exception as e:
@@ -144,7 +144,7 @@ def getTemp1():
 @app.route("/getTemp2", methods=['GET'])
 def getTemp2():
 	try:
-		select2 = "select temp,humd,UNIX_TIMESTAMP(date),convert_tz(date,'+00:00','-05:00') from tempdata3 order by id desc limit 1"
+		select2 = "select temp,humd,UNIX_TIMESTAMP(date) * 1000,convert_tz(date,'+00:00','-05:00') from tempdata3 order by id desc limit 1"
 		tempData2 = query_db(select2)
 	except Exception as e:
 		print("Error in /getTemp2 endpoint", e)
@@ -153,7 +153,7 @@ def getTemp2():
 		return jsonify(e), 500
 
 	s = Sensor(tempData2[0][0],tempData2[0][1],tempData2[0][2],tempData2[0][3])
-	return {"temp":s.temp,"humid":s.humid,"last_updated":s.time_unix,"last_updated_normal":s.time_normal}, 200
+	return {"temp":s.temp,"humid":s.humid, "last_updated":s.time_unix,"last_updated_normal":s.time_normal}, 200
 
 
 @app.route("/getErrors",methods=['GET'])
@@ -201,6 +201,8 @@ def maintenance():
 def page_not_found(e):
     return render_template('404.html'), 404
 
+# Util functions
+
 def query_db(query):
     sema.acquire()
 
@@ -231,7 +233,6 @@ def query_db(query):
         sema.release()
 
     return query_result
-
 
 #web server
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
