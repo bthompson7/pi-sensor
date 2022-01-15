@@ -6,7 +6,7 @@
 ## If you're interested in the data collected so far [click here](https://raw.githubusercontent.com/bthompson7/pi-sensor/master/database/temps_db.sql).
 
 # Screenshots
-![Screenshot from 2021-02-02 15-47-23](https://user-images.githubusercontent.com/35780502/106660447-fe773d00-656d-11eb-8624-341a7942af54.png)
+![Screenshot from 2022-01-14 23-26-22](https://user-images.githubusercontent.com/35780502/149608774-92cb7ae4-7cfc-4fc6-82e6-b9679b3fed3a.png)
 
 ![Screenshot from 2020-12-27 17-59-26](https://user-images.githubusercontent.com/35780502/103181265-664eaf80-486d-11eb-8b2c-5d27e6961629.png)
 ![Screenshot from 2020-12-27 17-59-52](https://user-images.githubusercontent.com/35780502/103181267-677fdc80-486d-11eb-9697-683e7f50e10e.png)
