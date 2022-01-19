@@ -22,6 +22,7 @@ do
            then
                 echo "Internet is up. Pushing database changes"
                 internet_is_up=true
+		git pull --no-edit
 		git add $backup_dir
 		git commit -m "Nightly automatic database backup"
 		git push
